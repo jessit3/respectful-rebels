@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rebel Quest · Respectful Rebels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE warm, cheeky, never school-like
+   IDEA a board game you play with your own life: tiles, a board, a piece, a map
+   PICTURE every choice is an illustration; the chessboard; the quest map
+   COLOUR warm ground, deep teal board, lavender tiles, pop violet for wins
+   TYPE Montserrat 800 for game words, Nunito for everything else
+   LAYOUT one decision per screen, big tap targets, progress dots + XP always visible */
+:root{--bg:#FAF8F6;--panel:#ded2eb;--accent:#b3c9f1;--action:#037A8C;--teal:#05ABC4;--pop:#b180bd;--ink:#3c2415;--line:#e9e0d7;--sq1:#f1ebe4;--sq2:#d9ccdf}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:Montserrat,system-ui,sans-serif;line-height:1.1;margin:0 0 .35em;text-wrap:balance}
+h1{font-size:clamp(28px,6vw,40px);font-weight:900}h2{font-size:clamp(22px,4.6vw,30px);font-weight:800}h3{font-size:18px;font-weight:800}
+.wrap{max-width:820px;margin:0 auto;padding:14px 16px 90px}
+.hud{display:flex;align-items:center;gap:10px;justify-content:space-between;font:800 13px Montserrat,sans-serif;padding:6px 0 12px}
+.hud .xp{background:var(--ink);color:#fff;border-radius:999px;padding:5px 12px}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:#e4dbd1}.dots i.on{background:var(--teal)}.dots i.now{background:var(--pop);transform:scale(1.3)}
+.lock{font-size:13px;color:#6a5446;background:#fff;border:1px dashed #cdbfb3;border-radius:12px;padding:8px 12px;margin:8px 0 14px}
+.sub{font-size:16px;color:#5b4637;margin:0 0 14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tile{position:relative;background:#fff;border:2px solid var(--line);border-radius:20px;padding:12px 10px 12px;text-align:center;cursor:pointer;font:700 15px Nunito,sans-serif;color:var(--ink);min-height:44px;transition:transform .15s,border-color .15s}
+.tile svg{width:100%;height:auto;max-height:110px;display:block;margin:0 auto 6px}
+.tile[aria-pressed=true]{border-color:var(--action);background:#eef7f8;transform:translateY(-3px)}
+.tile[aria-pressed=true]::after{content:"\2713";position:absolute;top:8px;right:10px;background:var(--action);color:#fff;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-size:15px}
+.tile small{display:block;font-weight:600;color:#6a5446;font-size:13px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--action);color:#fff;border:0;border-radius:16px;padding:14px 22px;font:800 17px Nunito,sans-serif;cursor:pointer;min-height:48px}
+.btn:disabled{opacity:.45;cursor:default}
+.ghost{background:transparent;color:var(--ink);border:2px solid var(--action);border-radius:14px;padding:9px 14px;font:700 15px Nunito,sans-serif;cursor:pointer;min-height:44px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--pop);outline-offset:3px}
+input[type=text],textarea{width:100%;font:16px Nunito,sans-serif;color:var(--ink);border:2px solid #cdbfb3;border-radius:14px;padding:12px;background:#fff}
+/* chessboard */
+.boardwrap{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@media(min-width:700px){.boardwrap{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}}
+.board{position:relative;aspect-ratio:1;width:100%;max-width:460px;border-radius:18px;overflow:hidden;touch-action:none;box-shadow:0 0 0 6px var(--ink);margin:6px auto}
+.board .sq{position:absolute;width:12.5%;height:12.5%}
+.corner{position:absolute;width:30%;display:flex;flex-direction:column;align-items:center;pointer-events:none;font:800 13px Montserrat,sans-serif;text-align:center}
+.corner svg{width:58%;height:auto;filter:drop-shadow(0 2px 0 rgba(60,36,21,.2))}
+.corner span{background:#fff;border-radius:999px;padding:2px 8px;margin-top:2px}
+.piece{position:absolute;width:13%;aspect-ratio:1;transform:translate(-50%,-62%);cursor:grab;touch-action:none;z-index:3}
+.piece svg{width:100%;height:auto;filter:drop-shadow(0 6px 4px rgba(60,36,21,.35))}
+.bars .row{display:grid;grid-template-columns:92px minmax(0,1fr) 44px;gap:8px;align-items:center;font-weight:700;font-size:15px;margin:6px 0}
+.bars .track{background:#eee6de;border-radius:8px;height:14px;overflow:hidden}.bars .fill{height:100%;background:var(--teal);border-radius:8px}
+/* map */
+.map{position:relative;background:linear-gradient(160deg,#e9f4f6,#f1e9f6);border-radius:24px;padding:10px;margin:8px 0 14px}
+.map svg{width:100%;height:auto;display:block}
+.node{cursor:pointer}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0}
+.moves{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:10px 0}
+.move{background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:12px;text-align:left;cursor:pointer;font:600 15px/1.45 Nunito,sans-serif;color:var(--ink)}
+.move svg{width:44px;height:44px;display:block;margin-bottom:6px}
+.move b{display:block;font:800 16px Montserrat,sans-serif;margin-bottom:2px}
+.move[aria-pressed=true]{border-color:var(--action);background:#eef7f8}
+.tip{display:flex;gap:8px;align-items:flex-start;font-size:15px;background:#f6f0fa;border-radius:12px;padding:8px 10px;margin:6px 0}
+.tip svg{width:26px;height:26px;flex:none}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--panel);border-radius:999px;padding:4px 12px;font:800 13px Montserrat,sans-serif}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge.off{background:#eee6de;color:#9a8574}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 0 10px;scroll-snap-type:x mandatory}
+.tabs button{flex:none;scroll-snap-align:start;border:2px solid var(--action);background:#fff;color:var(--ink);border-radius:999px;padding:8px 14px;font:800 14px Nunito,sans-serif;cursor:pointer;min-height:44px}
+.tabs button[aria-selected=true]{background:var(--action);color:#fff}
+.compass{background:var(--ink);color:#fff;border-radius:24px;padding:20px;display:grid;gap:12px}
+@media(min-width:640px){.compass{grid-template-columns:160px minmax(0,1fr);align-items:center}}
+.compass svg{width:140px;height:140px;margin:auto}
+.compass .eyebrow{font:800 12px Montserrat,sans-serif;letter-spacing:.08em;color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--pop);color:#fff;font:800 16px Montserrat,sans-serif;border-radius:999px;padding:12px 20px;box-shadow:0 8px 24px rgba(60,36,21,.25);z-index:9;animation:pop .5s ease}
+@keyframes pop{from{transform:translate(-50%,20px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.offer{background:var(--action);color:#fff;border-radius:20px;padding:20px;margin:16px 0}
+.offer a{display:inline-block;background:#fff;color:var(--action);font-weight:800;border-radius:12px;padding:10px 16px;text-decoration:none;margin-top:8px}
+pre{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px;max-height:300px;overflow:auto}
+.note{font-size:14px;color:#6a5446}
+.inrow{display:flex;gap:8px;align-items:stretch}.inrow>input,.inrow>textarea{flex:1}
+.mic{flex:none;width:56px;border:2px solid var(--action);background:#fff;border-radius:14px;cursor:pointer;padding:6px}.mic svg{width:100%;height:auto}.mic.on{background:var(--pop);border-color:var(--pop)}
+.hint{font-size:13px;color:#6a5446;margin:4px 0 0}
+.tiles.c3 .tile{font-size:14px;padding:10px 6px}.tiles.c3 .tile small{font-size:12px}
+.ranks{display:grid;gap:8px}.rank{display:flex;gap:10px;align-items:center;border-radius:14px;padding:10px 12px;background:#fff;border:1px solid var(--line)}.rank.off{opacity:.55}.rank b{font-family:Montserrat,sans-serif}
+.lvlbar{height:12px;background:#eee6de;border-radius:8px;overflow:hidden;margin:8px 0}.lvlbar i{display:block;height:100%;background:var(--pop)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div aria-live="polite" class="sr" id="live"></div>
+<script>
+{
+/* Everything stays in this browser. Nothing is sent anywhere. */
+var KEY='rebels-quest-v2';
+var C={ink:'#3c2415',teal:'#05ABC4',deep:'#037A8C',pop:'#b180bd',lav:'#ded2eb',sky:'#b3c9f1',sun:'#f4c95d',coral:'#ee8b6b',leaf:'#7cc29a',bg:'#FAF8F6'};
+
+/* ---------- original illustrations (swap for FEA Create library images in AI Studio: same keys) ---------- */
+function sv(body,vb){return '<svg viewBox="'+(vb||'0 0 120 100')+'" aria-hidden="true" focusable="false">'+body+'</svg>';}
+var ART={
+ game:sv('<ellipse cx="60" cy="88" rx="44" ry="6" fill="#0001"/><path d="M22 40c4-12 18-14 24-8h28c6-6 20-4 24 8l8 26c3 10-8 18-16 10l-10-10H40L30 76c-8 8-19 0-16-10z" fill="'+C.deep+'"/><rect x="31" y="44" width="16" height="5" rx="2" fill="#fff"/><rect x="36.5" y="38.5" width="5" height="16" rx="2" fill="#fff"/><circle cx="82" cy="42" r="4.5" fill="'+C.sun+'"/><circle cx="91" cy="51" r="4.5" fill="'+C.coral+'"/><circle cx="73" cy="51" r="4.5" fill="'+C.leaf+'"/><circle cx="82" cy="60" r="4.5" fill="'+C.sky+'"/>'),
+ create:sv('<ellipse cx="60" cy="90" rx="42" ry="5" fill="#0001"/><path d="M58 14c-26 0-44 18-44 38 0 16 12 26 26 24 8-1 8-10 16-10 10 0 12 14 26 12 14-2 24-14 24-28 0-22-22-36-48-36z" fill="'+C.lav+'"/><circle cx="36" cy="44" r="7" fill="'+C.coral+'"/><circle cx="56" cy="32" r="7" fill="'+C.sun+'"/><circle cx="78" cy="38" r="7" fill="'+C.teal+'"/><circle cx="86" cy="58" r="7" fill="'+C.pop+'"/><path d="M96 8v34" stroke="'+C.ink+'" stroke-width="4"/><ellipse cx="90" cy="44" rx="8" ry="6" fill="'+C.ink+'"/><path d="M96 8l12 6v10l-12-6z" fill="'+C.ink+'"/>'),
+ planet:sv('<ellipse cx="60" cy="90" rx="40" ry="5" fill="#0001"/><circle cx="60" cy="48" r="34" fill="'+C.sky+'"/><path d="M34 34c8-6 18 2 14 10s4 12-4 18-16-2-16-10 0-14 6-18zM70 22c10 0 20 8 18 18s-12 6-14 14-10 4-10-6 0-26 6-26z" fill="'+C.leaf+'"/><path d="M84 74c10-14 26-14 30-26-14 0-26 6-30 26z" fill="'+C.leaf+'" stroke="'+C.ink+'" stroke-width="2"/>'),
+ people:sv('<ellipse cx="60" cy="90" rx="44" ry="5" fill="#0001"/><circle cx="40" cy="32" r="12" fill="'+C.coral+'"/><path d="M18 84c0-18 10-30 22-30s22 12 22 30z" fill="'+C.deep+'"/><circle cx="80" cy="32" r="12" fill="'+C.sun+'"/><path d="M58 84c0-18 10-30 22-30s22 12 22 30z" fill="'+C.pop+'"/><path d="M60 22c-4-6-12-2-8 4l8 8 8-8c4-6-4-10-8-4z" fill="'+C.coral+'"/>'),
+ build:sv('<ellipse cx="60" cy="90" rx="42" ry="5" fill="#0001"/><circle cx="48" cy="50" r="26" fill="'+C.deep+'"/><g fill="'+C.deep+'"><rect x="44" y="16" width="8" height="12" rx="2"/><rect x="44" y="72" width="8" height="12" rx="2"/><rect x="14" y="46" width="12" height="8" rx="2"/><rect x="70" y="46" width="12" height="8" rx="2"/></g><circle cx="48" cy="50" r="10" fill="'+C.bg+'"/><path d="M78 80l26-26m-6-14a10 10 0 1 0 8 16l-6-2-2-6 6-6a10 10 0 0 0-6-2z" stroke="'+C.ink+'" stroke-width="7" stroke-linecap="round" fill="none"/>'),
+ tech:sv('<ellipse cx="60" cy="90" rx="44" ry="5" fill="#0001"/><rect x="16" y="18" width="88" height="58" rx="8" fill="'+C.ink+'"/><rect x="22" y="24" width="76" height="46" rx="4" fill="'+C.deep+'"/><path d="M42 38l-10 9 10 9M78 38l10 9-10 9M64 34l-8 26" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><rect x="40" y="78" width="40" height="6" rx="3" fill="'+C.ink+'"/>'),
+ sport:sv('<ellipse cx="60" cy="90" rx="40" ry="5" fill="#0001"/><circle cx="60" cy="48" r="34" fill="#fff" stroke="'+C.ink+'" stroke-width="4"/><path d="M60 30l12 9-5 14H53l-5-14z" fill="'+C.ink+'"/><path d="M60 14v16M26 40l22-1M94 40l-22-1M40 78l13-25M80 78l-13-25" stroke="'+C.ink+'" stroke-width="3"/>'),
+ travel:sv('<ellipse cx="60" cy="90" rx="44" ry="5" fill="#0001"/><circle cx="60" cy="48" r="34" fill="'+C.sun+'"/><path d="M60 14v68M26 48h68M60 14c-14 18-14 50 0 68M60 14c14 18 14 50 0 68" stroke="'+C.ink+'" stroke-width="3" fill="none"/><path d="M76 20l30-6-6 30-8-12-12 8z" fill="'+C.coral+'" stroke="'+C.ink+'" stroke-width="2"/>'),
+ /* corners */
+ make:sv('<path d="M30 80l6-22 44-44 16 16-44 44z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><path d="M30 80l6-22 16 16z" fill="'+C.ink+'"/><path d="M92 58l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="'+C.pop+'"/>'),
+ fix:sv('<path d="M32 82l34-34m-6-20a16 16 0 1 0 14 24l-9-3-3-9 9-9a16 16 0 0 0-11-3z" stroke="'+C.ink+'" stroke-width="10" stroke-linecap="round" fill="none"/><circle cx="32" cy="82" r="6" fill="'+C.teal+'"/>'),
+ lead:sv('<path d="M36 90V14" stroke="'+C.ink+'" stroke-width="7" stroke-linecap="round"/><path d="M40 16h50l-10 16 10 16H40z" fill="'+C.coral+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/>'),
+ explore:sv('<circle cx="60" cy="50" r="38" fill="#fff" stroke="'+C.ink+'" stroke-width="6"/><path d="M60 20l10 30-10 30-10-30z" fill="'+C.teal+'"/><path d="M60 50l10 0-10 30-10-30z" fill="'+C.ink+'"/><circle cx="60" cy="50" r="5" fill="'+C.sun+'"/>'),
+ /* struggles */
+ time:sv('<circle cx="60" cy="52" r="36" fill="#fff" stroke="'+C.ink+'" stroke-width="6"/><path d="M60 28v24l16 10" stroke="'+C.coral+'" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M30 18l-10 10M90 18l10 10" stroke="'+C.ink+'" stroke-width="7" stroke-linecap="round"/>'),
+ money:sv('<rect x="14" y="24" width="70" height="44" rx="6" fill="'+C.leaf+'" stroke="'+C.ink+'" stroke-width="4" transform="rotate(-8 49 46)"/><circle cx="49" cy="46" r="10" fill="none" stroke="'+C.ink+'" stroke-width="4"/><circle cx="86" cy="66" r="18" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4"/><path d="M86 56v20M80 62h10" stroke="'+C.ink+'" stroke-width="4"/>'),
+ noidea:sv('<path d="M60 12c-20 0-32 14-32 30 0 12 8 18 12 26v8h40v-8c4-8 12-14 12-26 0-16-12-30-32-30z" fill="'+C.lav+'" stroke="'+C.ink+'" stroke-width="4"/><rect x="42" y="80" width="36" height="10" rx="4" fill="'+C.ink+'"/><path d="M52 38c0-8 16-8 16 0 0 6-8 6-8 14" stroke="'+C.ink+'" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="60" cy="62" r="4" fill="'+C.ink+'"/>'),
+ talk:sv('<path d="M16 22h62a8 8 0 0 1 8 8v28a8 8 0 0 1-8 8H42l-18 16v-16h-8a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8z" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><path d="M78 40h26a6 6 0 0 1 6 6v22a6 6 0 0 1-6 6h-4v12l-14-12H78" fill="'+C.pop+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><path d="M30 44h40" stroke="'+C.ink+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 10"/>'),
+ permission:sv('<rect x="30" y="44" width="60" height="44" rx="8" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4"/><path d="M42 44V32a18 18 0 0 1 36 0v12" stroke="'+C.ink+'" stroke-width="7" fill="none"/><circle cx="60" cy="62" r="6" fill="'+C.ink+'"/><path d="M60 66v10" stroke="'+C.ink+'" stroke-width="5"/>'),
+ energy:sv('<rect x="20" y="30" width="72" height="40" rx="8" fill="#fff" stroke="'+C.ink+'" stroke-width="5"/><rect x="92" y="42" width="8" height="16" rx="2" fill="'+C.ink+'"/><rect x="27" y="37" width="14" height="26" rx="3" fill="'+C.coral+'"/>'),
+ language:sv('<rect x="10" y="20" width="56" height="44" rx="8" fill="'+C.teal+'"/><text x="38" y="52" font-family="Montserrat,sans-serif" font-weight="800" font-size="28" fill="#fff" text-anchor="middle">Aa</text><rect x="54" y="38" width="56" height="44" rx="8" fill="'+C.pop+'"/><text x="82" y="70" font-family="sans-serif" font-weight="800" font-size="26" fill="#fff" text-anchor="middle">&#25991;</text>'),
+ /* annoyances */
+ wifi:sv('<path d="M20 44a56 56 0 0 1 80 0M32 58a38 38 0 0 1 56 0M46 72a18 18 0 0 1 28 0" stroke="'+C.ink+'" stroke-width="7" stroke-linecap="round" fill="none"/><circle cx="60" cy="84" r="6" fill="'+C.ink+'"/><path d="M82 70l20 20M102 70L82 90" stroke="'+C.coral+'" stroke-width="7" stroke-linecap="round"/>'),
+ litter:sv('<path d="M34 34h52l-6 56H40z" fill="'+C.leaf+'" stroke="'+C.ink+'" stroke-width="4"/><rect x="28" y="24" width="64" height="10" rx="4" fill="'+C.ink+'"/><path d="M18 88l10-8 6 10zM92 86l10-10 6 12z" fill="'+C.coral+'"/><rect x="96" y="54" width="10" height="18" rx="3" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="2" transform="rotate(30 101 63)"/>'),
+ unfair:sv('<path d="M60 14v70M30 84h60" stroke="'+C.ink+'" stroke-width="6" stroke-linecap="round"/><path d="M20 30l80-12" stroke="'+C.ink+'" stroke-width="6" stroke-linecap="round"/><path d="M8 54a14 8 0 0 0 28 0L22 30z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="3"/><path d="M86 42a14 8 0 0 0 28 0L100 18z" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="3"/>'),
+ leftout:sv('<circle cx="30" cy="34" r="10" fill="'+C.sky+'"/><circle cx="54" cy="34" r="10" fill="'+C.sky+'"/><path d="M14 80c0-16 8-26 16-26s16 10 16 26zM38 80c0-16 8-26 16-26s16 10 16 26z" fill="'+C.deep+'"/><circle cx="96" cy="40" r="10" fill="'+C.coral+'"/><path d="M80 84c0-16 8-26 16-26s16 10 16 26z" fill="'+C.pop+'"/><path d="M74 28h-4" stroke="'+C.ink+'" stroke-width="4" stroke-dasharray="2 4"/>'),
+ bored:sv('<circle cx="56" cy="54" r="32" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4"/><path d="M40 50h10M62 50h10M44 68h24" stroke="'+C.ink+'" stroke-width="5" stroke-linecap="round"/><text x="96" y="34" font-family="Montserrat,sans-serif" font-weight="900" font-size="22" fill="'+C.pop+'">z</text><text x="104" y="18" font-family="Montserrat,sans-serif" font-weight="900" font-size="16" fill="'+C.pop+'">z</text>'),
+ waste:sv('<rect x="26" y="14" width="68" height="76" rx="8" fill="#fff" stroke="'+C.ink+'" stroke-width="4"/><path d="M38 34h44M38 48h44M38 62h30" stroke="'+C.sky+'" stroke-width="6" stroke-linecap="round"/><path d="M70 66l22 22M92 66L70 88" stroke="'+C.coral+'" stroke-width="7" stroke-linecap="round"/>'),
+ /* who to help */
+ kids:sv('<circle cx="60" cy="38" r="14" fill="'+C.sun+'"/><path d="M38 90c0-20 10-34 22-34s22 14 22 34z" fill="'+C.leaf+'"/><circle cx="96" cy="26" r="6" fill="'+C.pop+'"/><path d="M96 32v40" stroke="'+C.ink+'" stroke-width="2"/>'),
+ peers:sv('<circle cx="36" cy="34" r="11" fill="'+C.coral+'"/><circle cx="60" cy="30" r="11" fill="'+C.sun+'"/><circle cx="84" cy="34" r="11" fill="'+C.sky+'"/><path d="M16 88c0-20 9-32 20-32s20 12 20 32zM40 86c0-22 9-34 20-34s20 12 20 34zM64 88c0-20 9-32 20-32s20 12 20 32z" fill="'+C.deep+'" opacity=".9"/>'),
+ animals:sv('<ellipse cx="60" cy="64" rx="22" ry="18" fill="'+C.coral+'"/><ellipse cx="32" cy="40" rx="9" ry="12" fill="'+C.coral+'"/><ellipse cx="50" cy="26" rx="9" ry="12" fill="'+C.coral+'"/><ellipse cx="70" cy="26" rx="9" ry="12" fill="'+C.coral+'"/><ellipse cx="88" cy="40" rx="9" ry="12" fill="'+C.coral+'"/>'),
+ street:sv('<path d="M14 88V50l22-18 22 18v38z" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><path d="M58 88V42l24-20 24 20v46z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><rect x="28" y="66" width="14" height="22" fill="'+C.ink+'"/><rect x="74" y="56" width="16" height="14" fill="#fff" stroke="'+C.ink+'" stroke-width="3"/>'),
+ world:sv('<circle cx="60" cy="50" r="36" fill="'+C.teal+'"/><path d="M36 30c10-4 16 6 10 12s2 14-8 16-10-6-10-12 2-14 8-16zM70 24c12 2 18 10 14 18s-10 4-14 12-8 0-8-10 2-20 8-20zM62 70c8-2 14 4 10 8s-12 2-10-8z" fill="'+C.leaf+'"/>'),
+ /* work style */
+ solo:sv('<circle cx="60" cy="32" r="14" fill="'+C.pop+'"/><path d="M34 90c0-22 12-38 26-38s26 16 26 38z" fill="'+C.deep+'"/><path d="M92 20l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="'+C.sun+'"/>'),
+ duo:sv('<circle cx="42" cy="34" r="12" fill="'+C.coral+'"/><circle cx="78" cy="34" r="12" fill="'+C.sun+'"/><path d="M20 90c0-20 10-34 22-34s22 14 22 34zM56 90c0-20 10-34 22-34s22 14 22 34z" fill="'+C.deep+'"/><path d="M52 66h16" stroke="#fff" stroke-width="5" stroke-linecap="round"/>'),
+ crew:sv('<circle cx="60" cy="50" r="40" fill="none" stroke="'+C.teal+'" stroke-width="4" stroke-dasharray="6 6"/><circle cx="60" cy="14" r="9" fill="'+C.coral+'"/><circle cx="96" cy="56" r="9" fill="'+C.sun+'"/><circle cx="28" cy="74" r="9" fill="'+C.pop+'"/><circle cx="60" cy="50" r="14" fill="'+C.deep+'"/>'),
+ /* idea status */
+ idea:sv('<path d="M60 10c-20 0-32 14-32 30 0 12 8 18 12 26v10h40V66c4-8 12-14 12-26 0-16-12-30-32-30z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4"/><rect x="42" y="80" width="36" height="10" rx="4" fill="'+C.ink+'"/><path d="M14 30l8 4M106 30l-8 4M60 0v4M20 60l8-2M100 60l-8-2" stroke="'+C.coral+'" stroke-width="5" stroke-linecap="round"/>'),
+ cloud:sv('<path d="M30 76c-14 0-20-10-18-20 2-10 12-14 20-12 2-14 14-24 28-22 12 2 20 12 20 22 10-2 22 4 22 16 0 10-8 16-18 16z" fill="'+C.lav+'" stroke="'+C.ink+'" stroke-width="4"/><text x="60" y="66" font-family="Montserrat,sans-serif" font-weight="900" font-size="26" fill="'+C.ink+'" text-anchor="middle">?</text>'),
+ /* moves */
+ say:sv('<rect x="44" y="10" width="32" height="52" rx="16" fill="'+C.pop+'" stroke="'+C.ink+'" stroke-width="4"/><path d="M30 46a30 30 0 0 0 60 0M60 76v14M44 90h32" stroke="'+C.ink+'" stroke-width="5" stroke-linecap="round" fill="none"/>','0 0 120 100'),
+ draw:sv('<rect x="14" y="14" width="74" height="74" rx="8" fill="#fff" stroke="'+C.ink+'" stroke-width="4"/><path d="M26 70c10-20 20 6 30-14s16 4 22-8" stroke="'+C.teal+'" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M76 92l6-18 26-26 10 10-26 26z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="3"/>'),
+ ask:sv('<path d="M14 20h70a8 8 0 0 1 8 8v34a8 8 0 0 1-8 8H44l-20 18V70H14a8 8 0 0 1-8-8V28a8 8 0 0 1 8-8z" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><text x="49" y="58" font-family="Montserrat,sans-serif" font-weight="900" font-size="30" fill="'+C.ink+'" text-anchor="middle">?</text>'),
+ rocket:sv('<ellipse cx="60" cy="92" rx="30" ry="5" fill="#0001"/><path d="M60 8c18 12 24 34 18 58H42C36 42 42 20 60 8z" fill="#fff" stroke="'+C.ink+'" stroke-width="4"/><circle cx="60" cy="38" r="9" fill="'+C.teal+'" stroke="'+C.ink+'" stroke-width="3"/><path d="M42 50L28 70h16M78 50l14 20H76" fill="'+C.coral+'" stroke="'+C.ink+'" stroke-width="3" stroke-linejoin="round"/><path d="M50 70c0 10 4 16 10 22 6-6 10-12 10-22z" fill="'+C.sun+'"/>'),
+ book:sv('<path d="M60 26C48 16 28 16 14 20v60c14-4 34-4 46 6 12-10 32-10 46-6V20c-14-4-34-4-46 6z" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><path d="M60 26v60" stroke="'+C.ink+'" stroke-width="4"/><path d="M24 36c10-2 20-2 28 2M24 50c10-2 20-2 28 2M68 38c8-4 18-4 28-2M68 52c8-4 18-4 28-2" stroke="'+C.ink+'" stroke-width="3" stroke-linecap="round"/>'),
+ school:sv('<path d="M14 88V46l46-26 46 26v42z" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><rect x="50" y="60" width="20" height="28" fill="'+C.ink+'"/><circle cx="60" cy="42" r="8" fill="#fff" stroke="'+C.ink+'" stroke-width="3"/><rect x="24" y="56" width="14" height="12" fill="#fff" stroke="'+C.ink+'" stroke-width="3"/><rect x="82" y="56" width="14" height="12" fill="#fff" stroke="'+C.ink+'" stroke-width="3"/>'),
+ face_spark:sv('<circle cx="60" cy="50" r="36" fill="'+C.sun+'" stroke="'+C.ink+'" stroke-width="4"/><circle cx="47" cy="44" r="5" fill="'+C.ink+'"/><circle cx="73" cy="44" r="5" fill="'+C.ink+'"/><path d="M42 60c10 12 26 12 36 0" stroke="'+C.ink+'" stroke-width="5" fill="none" stroke-linecap="round"/>'),
+ face_ok:sv('<circle cx="60" cy="50" r="36" fill="'+C.sky+'" stroke="'+C.ink+'" stroke-width="4"/><circle cx="47" cy="44" r="5" fill="'+C.ink+'"/><circle cx="73" cy="44" r="5" fill="'+C.ink+'"/><path d="M46 64h28" stroke="'+C.ink+'" stroke-width="5" stroke-linecap="round"/>'),
+ face_stuck:sv('<circle cx="60" cy="50" r="36" fill="'+C.lav+'" stroke="'+C.ink+'" stroke-width="4"/><path d="M42 42l10 4M78 42l-10 4" stroke="'+C.ink+'" stroke-width="5" stroke-linecap="round"/><path d="M44 66c4-6 10-2 16-6s12 2 16 4" stroke="'+C.ink+'" stroke-width="5" fill="none" stroke-linecap="round"/>'),
+ pawn:sv('<ellipse cx="50" cy="96" rx="30" ry="7" fill="#0003"/><path d="M22 92c0-10 8-14 14-16 2-10 0-20-6-26h40c-6 6-8 16-6 26 6 2 14 6 14 16z" fill="'+C.pop+'" stroke="'+C.ink+'" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="30" r="16" fill="'+C.pop+'" stroke="'+C.ink+'" stroke-width="4"/><rect x="26" y="44" width="48" height="8" rx="4" fill="'+C.ink+'"/><path d="M44 24l6 6 8-10" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>','0 0 100 104')
+};
+
+window.__ART=ART;
+function fixCols(root){root.querySelectorAll('.tiles').forEach(function(g){var n=g.children.length,w=g.clientWidth||360,c;if(w>=640){c=n<=5?n:(n%4===0?4:3);}else{c=(n===2||n===4||n===8)?2:(n===1?1:3);}g.style.gridTemplateColumns='repeat('+c+',minmax(0,1fr))';g.classList.toggle('c3',c>=3&&w<640);});}
+new MutationObserver(function(){fixCols(document);}).observe(document.getElementById('app'),{childList:true});
+window.addEventListener('resize',function(){fixCols(document);});
+function mic(id){return '<button type="button" class="mic" data-mic="'+id+'" aria-label="Talk instead of typing">'+ART.say+'</button>';}
+function bindMics(){app.querySelectorAll('[data-mic]').forEach(function(b){b.onclick=function(){var el=document.getElementById(b.dataset.mic),SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Tap the microphone on your keyboard to talk instead.');el.focus();return;}
+  try{var r=new SR();r.lang=navigator.language||'en-US';r.interimResults=false;b.classList.add('on');say('Listening');
+    r.onresult=function(e){var t=e.results[0][0].transcript;el.value=(el.value?el.value+' ':'')+t;el.dispatchEvent(new Event('input'));};
+    r.onerror=function(){toast('Mic not available here. Use the mic on your keyboard.');};r.onend=function(){b.classList.remove('on');};r.start();}catch(e){toast('Use the mic on your keyboard to talk.');}};});}
+var VOICEHINT='<p class="hint">Prefer to talk? Tap the mic, or the mic on your keyboard. Any language.</p>';
+/* ---------- the game ---------- */
+var INTERESTS=[['game','Games','video or board'],['create','Art, music, video','and stories'],['planet','Animals and the planet',''],['people','Friends and helping',''],['build','Making and fixing',''],['tech','Tech and coding',''],['sport','Sport and moving',''],['travel','Places and cultures','']];
+var IWORD={game:'games',create:'making art, music or videos',planet:'animals and the planet',people:'friends and helping people',build:'making and fixing things',tech:'tech and coding',sport:'sport',travel:'places and cultures'};
+var CORNERS=[['make','Create','Make something new'],['fix','Fix','Solve what’s broken'],['lead','Lead','Get people moving'],['explore','Explore','Find out what’s out there']];
+var ANNOY=[['wifi','Things that don’t work','slow, broken, glitchy'],['litter','Mess and waste','litter, plastic, waste'],['unfair','Things that aren’t fair','rules, prices, chances'],['leftout','People left out','new kids, quiet ones'],['bored','Boring stuff','that could be fun'],['waste','Pointless tasks','that waste everyone’s time']];
+var AWORD={wifi:'things that don’t work',litter:'mess and waste',unfair:'things that aren’t fair',leftout:'people being left out',bored:'boring stuff that could be fun',waste:'pointless tasks'};
+var HELP=[['kids','Younger kids'],['peers','People my age'],['animals','Animals'],['street','My street or town'],['world','Someone far away']];
+var HWORD={kids:'younger kids',peers:'people your age',animals:'animals (and the people who look after them)',street:'people on your street or in your town',world:'someone in another country'};
+var STRUG=[['time','Time','not enough of it'],['money','Money','things cost'],['noidea','Ideas','I don’t have one yet'],['talk','Talking','to people I don’t know'],['permission','Permission','adults say no'],['energy','Energy','I run out'],['language','Language','English isn’t my first'],['face_spark','Nothing right now','I’m ready to go']];
+var WORK=[['solo','On my own'],['duo','With a friend'],['crew','With Rebels around the world']];
+var STARTOPT=[['idea','I’ve got an idea','a','The Spark'],['game','I just love something','b','The Player'],['cloud','No idea yet','c','The Dreamer']];
+var TIPS={
+ time:['time','10-minute version: pick the quickest move, do it, then stop. That still counts.'],
+ money:['money','Zero-cost version: use what’s already around you. In the Rebels cohort, projects that need money can apply for a scholarship.'],
+ noidea:['noidea','No idea yet is fine. This mission is how ideas show up.'],
+ talk:['talk','Start with someone you already know, or send a message instead of talking.'],
+ permission:['permission','Grown-up check: anything online or away from home, ask first. Show them this mission.'],
+ energy:['energy','Low battery? Pick the smallest move. Done beats perfect.'],
+ language:['language','Any language counts. Say it in the language you think in.']
+};
+var BADGES=['Inquirer','Advocate','Trailblazer','Innovator','Connector','Catalyst'];
+var STEPS=['start','interests','board','annoy','help','struggles','work'];
+
+function blank(){return {step:0,start:'',interests:[],pos:{x:.5,y:.5},moved:false,annoy:'',own:'',help:'',strug:[],work:'',done:{},move:{},proof:{},feel:{},xp:0,tab:'map',open:0,setup:false,sessions:[],jots:[]};}
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){return null;}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+var S=load()||blank();if(!S.sessions)S.sessions=[];if(!S.jots)S.jots=[];
+/* parent's finder answers, if they came via the results page */
+try{var p=new URLSearchParams(location.search),hand=localStorage.getItem('rebels-quest-handoff');
+  var r=p.get('r'),a=p.get('a')||'';if(!r&&hand){r=hand.split(':')[0];a=hand.split(':')[1]||'';}
+  localStorage.removeItem('rebels-quest-handoff');
+  if(r&&!S.setup){S.start=r.replace(/[^abc]/g,'');var ii=['game','build','create','planet','people'][+a[0]];if(ii&&S.interests.indexOf(ii)<0)S.interests=[ii==='build'?'build':ii];}
+  if(location.search&&history.replaceState)history.replaceState(null,'',location.pathname);}catch(e){}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function weights(){var x=S.pos.x,y=S.pos.y,pts=[[0,0],[1,0],[0,1],[1,1]];var w=pts.map(function(q){return Math.max(0,1.2-Math.hypot(x-q[0],y-q[1]));});var t=w.reduce(function(a,b){return a+b;},0)||1;return w.map(function(v){return v/t;});}
+function topCorner(){var w=weights(),m=0;w.forEach(function(v,i){if(v>w[m])m=i;});return {i:m,key:CORNERS[m][0],name:CORNERS[m][1],allround:(Math.max.apply(null,w)<.34)};}
+function say(t){document.getElementById('live').textContent=t;}
+function toast(t){var d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},1800);say(t);}
+var app=document.getElementById('app');
+
+var RANKS=[['Rookie Rebel',0,'Your quest begins.'],['Spark Keeper',60,'Unlocks Side Quests: bonus challenges from the Rebels\u2019 Handbook.'],['Pathfinder',120,'Unlocks your Rebel Card: a one-screen summary of your project to show friends and family.'],['Trailblazer',180,'Unlocks Mentor Mode: a tip of yours to pass on to the next Rebel.'],['Changemaker',240,'All six missions done. You\u2019ve started something real.']];
+function rank(){var r=0;RANKS.forEach(function(x,i){if(S.xp>=x[1])r=i;});return r;}
+var SIDE=[['Option C','When both choices feel bad, invent a third one. Try it on one decision this week.'],['Swap shoes','Explain your problem as if you were someone it bugs. What do they notice that you don\u2019t?'],['Culture swap','Find out how young people in another country deal with the same problem (online with a grown-up\u2019s OK).'],['Tiny budget','What could your project do with \u00a30, \u00a35 and \u00a350? Pick the \u00a30 version first.']];
+function rankCard(){var r=rank(),nx=RANKS[r+1],pct=nx?Math.round((S.xp-RANKS[r][1])/(nx[1]-RANKS[r][1])*100):100,w=words(),ms=missions();
+  var h='<div class="card"><h2>What your XP is for</h2><p class="note" style="margin:0">You earn XP by doing (missions, jots, check-ins), never just for time on screen. No streaks, no pressure.</p><p style="margin:10px 0 0"><b>'+RANKS[r][0]+'</b> \u00b7 '+S.xp+' XP'+(nx?' \u00b7 '+(nx[1]-S.xp)+' XP to '+nx[0]:'')+'</p><div class="lvlbar"><i style="width:'+pct+'%"></i></div><div class="ranks">'+RANKS.map(function(x,i){return '<div class="rank'+(i<=r?'':' off')+'">'+(i<=r?'\u2605':'\ud83d\udd12')+'<span><b>'+x[0]+'</b> <span class="note">('+x[1]+' XP)</span><br>'+esc(x[2])+'</span></div>';}).join('')+'</div></div>';
+  if(r>=1)h+='<div class="card"><h3>Side Quests</h3>'+SIDE.map(function(s){return '<p style="margin:6px 0"><b>'+esc(s[0])+':</b> '+esc(s[1])+'</p>';}).join('')+'</div>';
+  if(r>=2){var card='MY REBEL PROJECT\nI love: '+w.love+'\nWhat bugs me: '+w.bug.replace(/[\u201c\u201d]/g,'')+'\nI want to help: '+w.who+'\nMy question: How might we help '+w.who+' with '+w.bug.replace(/[\u201c\u201d]/g,'')+'?\nBadges: '+BADGES.filter(function(_,i){return S.done[i];}).join(', ');
+    h+='<div class="card"><h3>Your Rebel Card</h3><pre>'+esc(card)+'</pre><button class="ghost" id="copycard">Copy my Rebel Card</button></div>';window.__card=card;}
+  if(r>=3)h+='<div class="card"><h3>Mentor Mode</h3><p>What\u2019s one tip you\u2019d give a Rebel just starting Mission 1? Say it to a friend, or bring it to a Rebels live session.</p></div>';
+  return h;}
+function hud(){var lvl=1+Math.floor(S.xp/60),l=(typeof left==='function')?left():null;return '<div class="hud"><span>REBEL QUEST</span><span style="display:flex;gap:6px;align-items:center">'+(l!=null?'<span class="xp" id="timer" style="background:var(--action)">⏱ '+fmtT(l)+'</span><button class="ghost" id="hudend" style="padding:4px 10px;min-height:32px;font-size:13px">End</button>':'')+'<button class="xp" id="xpchip" style="border:0;cursor:pointer;font:inherit">'+RANKS[rank()][0]+' · '+S.xp+' XP</button></span></div>';}
+function lockNote(){return '<p class="lock">🔒 Your quest saves only in this browser, on this device. Nobody else sees it, not even Jess. Clear your browser or switch devices and it’s gone.</p>';}
+
+/* ---------- setup screens: one choice each ---------- */
+function setup(){
+  var st=STEPS[S.step],h=hud()+'<div class="dots" aria-label="Step '+(S.step+1)+' of '+STEPS.length+'">'+STEPS.map(function(_,i){return '<i class="'+(i<S.step?'on':i===S.step?'now':'')+'"></i>';}).join('')+'</div><br>';
+  var ok=false;
+  if(st==='start'){h+='<h1>Let’s build your quest.</h1>'+lockNote()+'<h2>Where are you right now?</h2><p class="sub">Tap the one that feels most like you.</p><div class="tiles">'+STARTOPT.map(function(o){return tile(o[2],ART[o[0]],o[1],'',S.start===o[2],'start');}).join('')+'</div>';ok=!!S.start;}
+  if(st==='interests'){h+='<h2>Which ones call to you?</h2><p class="sub">Pick up to 3. Go with your gut.</p><div class="tiles">'+INTERESTS.map(function(o){return tile(o[0],ART[o[0]],o[1],o[2],S.interests.indexOf(o[0])>-1,'int');}).join('')+'</div>';ok=S.interests.length>0;}
+  if(st==='board'){h+='<h2>Move your piece.</h2><p class="sub">Drag it toward what you love. Right on a corner if you love that one most. In the middle if you love them all. (Arrow keys work too.)</p><div class="boardwrap"><div>'+board()+'</div><div class="card"><h3>You lean toward</h3><div class="bars" id="bars">'+bars()+'</div></div></div>';ok=true;}
+  if(st==='annoy'){h+='<h2>What bugs you that adults don’t seem to notice?</h2><p class="sub">Pick one. Annoyances are where projects come from.</p><div class="tiles">'+ANNOY.map(function(o){return tile(o[0],ART[o[0]],o[1],o[2],S.annoy===o[0],'annoy');}).join('')+'</div><p style="margin-top:14px"><label for="own"><b>Or say it your way</b> (optional, any language)</label><span class="inrow"><input type="text" id="own" maxlength="80" value="'+esc(S.own)+'" placeholder="e.g. tournaments that lag">'+mic('own')+'</span>'+VOICEHINT+'</p>';ok=!!(S.annoy||S.own.trim());}
+  if(st==='help'){h+='<h2>Who would you most like to help?</h2><div class="tiles">'+HELP.map(function(o){return tile(o[0],ART[o[0]],o[1],'',S.help===o[0],'help');}).join('')+'</div>';ok=!!S.help;}
+  if(st==='struggles'){h+='<h2>What gets in your way?</h2><p class="sub">Pick all that are true. Your missions will work around them.</p><div class="tiles">'+STRUG.map(function(o){return tile(o[0],ART[o[0]],o[1],o[2],S.strug.indexOf(o[0])>-1,'strug');}).join('')+'</div>';ok=true;}
+  if(st==='work'){h+='<h2>How do you like to work?</h2><div class="tiles">'+WORK.map(function(o){return tile(o[0],ART[o[0]],o[1],'',S.work===o[0],'work');}).join('')+'</div>';ok=!!S.work;}
+  h+='<div class="foot">'+(S.step>0?'<button class="ghost" id="back">Back</button>':'<span></span>')+'<button class="btn" id="next" '+(ok?'':'disabled')+'>'+(S.step===STEPS.length-1?'Reveal my quest':'Next')+' →</button></div>';
+  app.innerHTML=h;
+  bindTiles();
+  var o=document.getElementById('own');if(o)o.oninput=function(){S.own=o.value;save();document.getElementById('next').disabled=!(S.annoy||S.own.trim());};
+  var b=document.getElementById('back');if(b)b.onclick=function(){S.step--;save();render();};
+  document.getElementById('next').onclick=function(){if(S.step===STEPS.length-1){setSess({mode:'deep',mins:0,start:Date.now(),ext:0});S.setup=true;S.tab='compass';S.xp+=20;save();render();toast('+20 XP · Quest unlocked');}else{S.step++;save();render();}window.scrollTo(0,0);};
+  if(st==='board')bindBoard();
+  bindMics();
+}
+function tile(v,art,label,small,on,group){return '<button class="tile" data-g="'+group+'" data-v="'+v+'" aria-pressed="'+on+'">'+art+label+(small?'<small>'+esc(small)+'</small>':'')+'</button>';}
+function bindTiles(){app.querySelectorAll('.tile').forEach(function(t){t.onclick=function(){var g=t.dataset.g,v=t.dataset.v;
+  if(g==='start')S.start=v; if(g==='annoy')S.annoy=(S.annoy===v?'':v); if(g==='help')S.help=v; if(g==='work')S.work=v;
+  if(g==='int'){var i=S.interests.indexOf(v);if(i>-1)S.interests.splice(i,1);else if(S.interests.length<3)S.interests.push(v);else{toast('Up to 3. Tap one to swap.');return;}}
+  if(g==='strug'){if(v==='face_spark'){S.strug=S.strug.indexOf(v)>-1?[]:[v];}else{S.strug=S.strug.filter(function(x){return x!=='face_spark';});var j=S.strug.indexOf(v);if(j>-1)S.strug.splice(j,1);else S.strug.push(v);}}
+  save();render();};});}
+function board(){
+  var sq='';for(var r=0;r<8;r++)for(var c=0;c<8;c++)sq+='<div class="sq" style="left:'+c*12.5+'%;top:'+r*12.5+'%;background:'+((r+c)%2?'var(--sq2)':'var(--sq1)')+'"></div>';
+  var pos=[['left:1%;top:3%'],['right:1%;top:3%'],['left:1%;bottom:2%'],['right:1%;bottom:2%']];
+  var cs=CORNERS.map(function(k,i){return '<div class="corner" style="'+pos[i]+'">'+ART[k[0]]+'<span>'+k[1]+'</span></div>';}).join('');
+  return '<div class="board" id="board" role="application" aria-label="Board with four corners: Create top left, Fix top right, Lead bottom left, Explore bottom right">'+sq+cs+'<div class="piece" id="piece" tabindex="0" role="slider" aria-label="Your piece" aria-valuetext="'+esc(leanText())+'" style="left:'+(S.pos.x*84+8)+'%;top:'+(S.pos.y*84+12)+'%">'+ART.pawn+'</div></div>';
+}
+function leanText(){var t=topCorner();return t.allround?'Somewhere in the middle: you like them all':'Closest to '+t.name;}
+function bars(){var w=weights();return CORNERS.map(function(k,i){var p=Math.round(w[i]*100);return '<div class="row"><span>'+k[1]+'</span><div class="track"><div class="fill" style="width:'+p+'%"></div></div><span>'+p+'%</span></div>';}).join('')+'<p class="note" style="margin:8px 0 0">'+esc(leanText())+'</p>';}
+function bindBoard(){
+  var bd=document.getElementById('board'),pc=document.getElementById('piece'),drag=false;
+  function place(cx,cy){var r=bd.getBoundingClientRect();var x=(cx-r.left)/r.width,y=(cy-r.top)/r.height;S.pos={x:Math.min(1,Math.max(0,(x-.08)/.84)),y:Math.min(1,Math.max(0,(y-.12)/.84))};upd();}
+  function upd(){pc.style.left=(S.pos.x*84+8)+'%';pc.style.top=(S.pos.y*84+12)+'%';document.getElementById('bars').innerHTML=bars();pc.setAttribute('aria-valuetext',leanText());S.moved=true;save();}
+  pc.addEventListener('pointerdown',function(e){drag=true;try{pc.setPointerCapture(e.pointerId);}catch(_){};e.preventDefault();});
+  bd.addEventListener('pointerdown',function(e){if(e.target.closest('#piece'))return;place(e.clientX,e.clientY);});
+  pc.addEventListener('pointermove',function(e){if(drag)place(e.clientX,e.clientY);});
+  pc.addEventListener('pointerup',function(){drag=false;say(leanText());});
+  pc.addEventListener('keydown',function(e){var d=1/7,m={ArrowLeft:[-d,0],ArrowRight:[d,0],ArrowUp:[0,-d],ArrowDown:[0,d]}[e.key];if(!m)return;e.preventDefault();S.pos={x:Math.min(1,Math.max(0,S.pos.x+m[0])),y:Math.min(1,Math.max(0,S.pos.y+m[1]))};upd();say(leanText());});
+}
+
+/* ---------- missions, written from their answers ---------- */
+function words(){
+  var top=topCorner(),love=S.interests.map(function(k){return IWORD[k];});
+  var loveTxt=love.length>1?love.slice(0,-1).join(', ')+' and '+love[love.length-1]:(love[0]||'what you love');
+  var bug=S.own.trim()?'“'+S.own.trim()+'”':(AWORD[S.annoy]||'something that bugs you');
+  return {love:loveTxt,first:IWORD[S.interests[0]]||'what you love',bug:bug,who:HWORD[S.help]||'someone',corner:top,abroad:S.work==='crew'};
+}
+function missions(){
+  var w=words(),c=w.corner.key;
+  var m1={a:{t:'Why does this matter?',p:'You’ve got an idea. Say why it matters to you, in one breath.',mv:[['say','Say it','30-second voice note on your phone: “My idea is… It matters to me because…”'],['draw','Draw it','Sketch your idea in three boxes: the problem, your idea, someone smiling.'],['ask','Ask it','Tell one person your idea. Ask: “Who do you think this is for?”']]},
+          b:{t:'Your game, decoded',p:'You love '+w.first+'. What part do you love solving most, and why?',mv:[['say','Say it','Voice note: which part you love, and the moment it feels best.'],['draw','Draw it','Draw the moment you love most, like a screenshot from your brain.'],['ask','Ask it','Ask a friend what they love about it. Same reason as you, or different?']]},
+          c:{t:'No limits',p:'Complete control, no rules, one whole week. What happens? Any answer counts, even “play games all day.”',mv:[['say','Say it','Voice note: your no-limits week. Then: what would you get bored of first?'],['draw','Draw it','A 4-frame comic of your no-limits week. Frame 4: the moment you get bored.'],['ask','Ask it','Ask someone else for their no-limits week. What’s the same as yours?']]}}[S.start||'c'];
+  var make={make:'Make the smallest version: a poster, a 30-second video, a sketch or a playlist about '+w.bug+'.',fix:'Build a rough fix for '+w.bug+': a hack, a checklist, a tool, a sign. Ugly is allowed.',lead:'Plan a 15-minute mini event or challenge that tackles '+w.bug+'. Who’s invited?',explore:'Make a one-page guide: how '+w.bug+' looks in two different places or for two different people.'}[c];
+  return [
+   {t:m1.t,p:m1.p,mv:m1.mv,q:'What did you notice about what you love?'},
+   {t:'Who else does it bug?',p:'You picked '+w.bug+'. Who else does that bug, especially '+w.who+'?',mv:[['ask','Ask two people','Ask two of them: “What’s the most annoying part of '+w.bug.replace(/“|”/g,'')+' for you?” Write down their exact words.'],['draw','Map it','Draw a quick map: you in the middle, everyone it bugs around you.'],['say','Guess, then check','Voice note: what you think they’d say. Then check with one person.']].concat(w.abroad?[['ask','Ask someone far away','Ask someone in another country (with a grown-up’s OK). Same problem there, or different?']]:[]),q:'Who did you talk to, and what surprised you?'},
+   {t:'How might we…?',p:'Turn it into a question: “How might we help '+w.who+' with '+w.bug.replace(/“|”/g,'')+'?”',mv:[['say','Say three versions','Say three different “How might we…?” questions out loud. Pick the one that gives you a buzz.'],['draw','Sticky-note it','Write three on sticky notes. Put a star on the one that feels most real.'],['ask','Why x 5','With a friend, ask “Why is that a problem?” five times in a row. The fifth answer is the real one.']],q:'What’s your “How might we…?” question?'},
+   {t:'Build level 1',p:'You lean '+(w.corner.allround?'all-rounder':w.corner.name)+'. So here’s your kind of first version.',mv:[['draw','Make it',make],['say','Pitch it','Record a 30-second pitch: the problem, your idea, who it helps.'],['ask','Ask an AI','With a grown-up’s OK, ask an AI tool for 10 versions. Pick one and change it until it’s yours.']],q:'Can I see level 1?'},
+   {t:'Find your first follower',p:'One person who says “yes, I want that.” That’s how every movement starts.',mv:[['ask','Show one person','Show level 1 to one person. Ask: “What would make you use this again?”'],['say','Tell your people','Share it where your people already are: a club, a team, a group. Online gets a grown-up’s OK first.'],['draw','Make the invite','Make a tiny invite or sign: what it is, who it’s for, how to join.']],q:'Who said yes, and what did they say?'},
+   {t:'One move this week',p:'Don’t wait for the perfect idea or the right time. The right time is now, even if it’s tiny.',mv:[['draw','Sticky note','Write one action and a day on a sticky note. Put it where you’ll see it.'],['say','Tell someone','Tell one person your plan and when. Saying it makes it real.'],['ask','Book a check-in','Ask someone to check on you in 7 days.']],q:'What’s your one move, and which day?'}
+  ];
+}
+function tipsFor(){return S.strug.filter(function(k){return TIPS[k];}).map(function(k){var t=TIPS[k];return '<div class="tip">'+ART[t[0]]+'<span>'+esc(t[1])+'</span></div>';}).join('');}
+
+/* ---------- main views ---------- */
+function mapSvg(ms){
+  var P=[[55,220],[175,140],[300,200],[420,110],[540,180],[660,90]];
+  var path='M'+P.map(function(p){return p.join(' ');}).join(' L');
+  var nodes=P.map(function(p,i){var d=S.done[i],now=(!d&&(i===0||S.done[i-1]));
+    return '<g class="node" data-open="'+i+'" tabindex="0" role="button" aria-label="Mission '+(i+1)+': '+esc(ms[i].t)+(d?', done':'')+'"><circle cx="'+p[0]+'" cy="'+p[1]+'" r="'+(now?36:32)+'" fill="'+(d?C.teal:now?C.pop:'#fff')+'" stroke="'+C.ink+'" stroke-width="4"/><text x="'+p[0]+'" y="'+(p[1]+8)+'" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="900" font-size="28" fill="'+(d||now?'#fff':C.ink)+'">'+(d?'✓':i+1)+'</text><text x="'+p[0]+'" y="'+(p[1]+60)+'" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="800" font-size="22" fill="'+C.ink+'">'+esc(BADGES[i])+'</text></g>';}).join('');
+  return '<div class="map">'+sv('<path d="'+path+'" stroke="'+C.ink+'" stroke-width="6" stroke-dasharray="2 14" stroke-linecap="round" fill="none"/>'+nodes+'<path d="M650 50l12-26 12 26z" fill="'+C.coral+'"/><path d="M662 24v26" stroke="'+C.ink+'" stroke-width="3"/>','0 0 720 300')+'</div>';
+}
+function tabs(){var T=[['compass','My compass'],['map','Quest map'],['record','My record'],['remix','Remix']];return '<div class="tabs" role="tablist">'+T.map(function(t){return '<button role="tab" data-tab="'+t[0]+'" aria-selected="'+(S.tab===t[0])+'">'+t[1]+'</button>';}).join('')+'</div>';}
+function compass(){
+  var w=words(),st={a:'The Spark',b:'The Player',c:'The Dreamer'}[S.start]||'The Dreamer',ws=weights();
+  var rose=sv('<circle cx="60" cy="50" r="44" fill="none" stroke="'+C.sky+'" stroke-width="2"/>'+[[60,8],[102,50],[18,50],[60,92]].map(function(){return '';}).join('')+
+    '<path d="M60 50L'+(60-40*ws[0])+' '+(50-40*ws[0])+'" stroke="'+C.sun+'" stroke-width="8" stroke-linecap="round"/><path d="M60 50L'+(60+40*ws[1])+' '+(50-40*ws[1])+'" stroke="'+C.teal+'" stroke-width="8" stroke-linecap="round"/><path d="M60 50L'+(60-40*ws[2])+' '+(50+40*ws[2])+'" stroke="'+C.coral+'" stroke-width="8" stroke-linecap="round"/><path d="M60 50L'+(60+40*ws[3])+' '+(50+40*ws[3])+'" stroke="'+C.pop+'" stroke-width="8" stroke-linecap="round"/><circle cx="60" cy="50" r="7" fill="#fff"/>','0 0 120 100');
+  return '<div class="compass">'+rose+'<div><p class="eyebrow">YOUR REBEL COMPASS</p><h2 style="color:#fff">'+esc(st)+' · '+esc(w.corner.allround?'All-rounder':w.corner.name)+'</h2><p style="margin:0">You love '+esc(w.love)+'. '+esc(w.bug.charAt(0).toUpperCase()+w.bug.slice(1))+' bugs you, and you’d most like to help '+esc(w.who)+'. That’s not random. That’s a project waiting to happen.</p></div></div>'+
+    (S.strug.length?'<div class="card"><h3>Your missions work around</h3>'+tipsFor()+'</div>':'')+
+    rankCard()+'<div class="foot"><button class="ghost" id="redo">Edit answers</button><button class="btn" data-tab="map">Start Mission 1 →</button></div>';
+}
+function quest(){
+  var ms=missions(),i=S.open||0,m=ms[i],mv=S.move[i];
+  var badges='<div class="badges">'+BADGES.map(function(b,k){return '<span class="badge'+(S.done[k]?'':' off')+'">'+(S.done[k]?'★':'☆')+' '+b+'</span>';}).join('')+'</div>';
+  return mapSvg(ms)+'<div class="card"><p class="note" style="margin:0">Mission '+(i+1)+' of 6 · earns the '+BADGES[i]+' badge</p><h2>'+esc(m.t)+'</h2><p>'+esc(m.p)+'</p><h3>Choose your move</h3><div class="moves">'+
+    m.mv.map(function(x,k){return '<button class="move" data-move="'+k+'" aria-pressed="'+(mv===k)+'">'+ART[x[0]]+'<b>'+esc(x[1])+'</b>'+esc(x[2])+'</button>';}).join('')+'</div>'+
+    tipsFor()+
+    (mv!=null?'<p><label for="proof"><b>Proof it happened</b> (one line, a word, anything)</label><span class="inrow"><input type="text" id="proof" maxlength="160" value="'+esc(S.proof[i]||'')+'" placeholder="What happened? What surprised you?">'+mic('proof')+'</span>'+VOICEHINT+'</p>':'')+
+    '<div class="foot"><span class="row" style="display:flex;gap:6px;flex-wrap:wrap">'+[['easy','Too easy'],['right','Just right'],['hard','Too hard'],['notme','Not me']].map(function(f){return '<button class="ghost" style="padding:6px 10px;font-size:13px" data-feel="'+f[0]+'" aria-pressed="'+(S.feel[i]===f[0])+'">'+f[1]+'</button>';}).join('')+'</span>'+
+    (S.done[i]?'<button class="ghost" data-undo="'+i+'">Done ✓ (undo)</button>':'<button class="btn" id="did" '+(mv==null?'disabled':'')+'>I did it! +30 XP</button>')+'</div></div>'+
+    '<div class="card"><h3>Your badges</h3>'+badges+'</div>';
+}
+function record(){
+  var ms=missions(),rows=ms.map(function(m,i){if(!S.done[i])return '';var mv=m.mv[S.move[i]]||['','',''];return '<div style="border-top:1px solid var(--line);padding:10px 0"><b>'+esc(S.done[i])+' · Mission '+(i+1)+': '+esc(m.t)+'</b><br><span class="note">Move: '+esc(mv[1])+' · Badge: '+BADGES[i]+'</span><p style="margin:4px 0">'+esc(S.proof[i]||'(no note)')+'</p></div>';}).join('');
+  return '<div class="card"><h2>My learning record</h2><p class="note">Every mission you finish adds a dated entry. Useful for a portfolio, an application, or if your family needs to show progress (check what your local rules ask for).</p>'+(rows||'<p>Nothing yet. Finish Mission 1 and it shows up here.</p>')+(S.jots.length?'<h3 style="margin-top:12px">My jots</h3>'+S.jots.map(function(j){return '<p style="margin:4px 0"><span class="note">'+esc(j.date)+'</span> '+esc(j.text)+'</p>';}).join(''):'')+'<button class="btn" id="copyrec">Copy my record</button></div>'+sessionsCard()+lockNote()+'<div class="card"><h3>Joining the Rebels cohort?</h3><p class="note">You can carry this quest into the Rebels Path app, only if you choose to.</p><button class="ghost" id="qcode">Copy my quest code</button> <button class="ghost" id="reset">Start over</button></div>';
+}
+function promptText(){var w=words(),ms=missions();return 'Remix my Respectful Rebels quest (no names or personal details).\n\nMe: '+({a:'The Spark',b:'The Player',c:'The Dreamer'}[S.start])+'. I love '+w.love+'. I lean '+(w.corner.allround?'all-rounder':w.corner.name)+'. What bugs me: '+w.bug+'. I want to help '+w.who+'. What gets in my way: '+(S.strug.join(', ')||'nothing much')+'. I like to work '+(S.work||'any way')+'.\n\nHow missions felt:\n'+ms.map(function(m,i){return '- '+m.t+': '+(S.feel[i]||'not rated')+(S.done[i]?' (done)':'');}).join('\n')+'\n\nRewrite the missions I rated too easy, too hard or not me. Keep it bite-sized, picture-led and playful, with three moves per mission (say it, make it, ask someone). One HTML file, saves only on this device, collects no personal data.';}
+function remix(){return '<div class="card"><h2>Remix your quest</h2><p>Rate missions as you go (too easy, too hard, not me). Then copy this into an AI tool you’re allowed to use, with a grown-up, and make the quest even more yours.</p><pre>'+esc(promptText())+'</pre><button class="btn" id="copypr">Copy my remix prompt</button></div><div class="offer"><p style="font:800 12px Montserrat,sans-serif;margin:0">FREE LIVE BUILD · TUESDAY, DECEMBER 29 · [TIME UK / US]</p><h2 style="color:#fff">Remix quests live with Jess</h2><p>Bring your ratings. We’ll remix quests like yours live, and show you how the January cohort helps you launch the real thing to at least 10 real people.</p><a href="[webinar link]">Save my free seat</a></div>';}
+function grown(){var n=Object.keys(S.done).length,ms=missions();return '<div class="card"><h2>For grown-ups</h2><p>Your teen leads this quest. Their answers stay on this device and are theirs to share.</p><p><b>'+n+' of 6 missions done · '+S.xp+' XP</b></p><h3>Dinner-table questions</h3><ul>'+ms.map(function(m){return '<li>'+esc(m.q)+'</li>';}).join('')+'</ul><p class="note">The mistake to avoid: waiting for the perfect idea or the right time. The right time is now, even if it’s a micro-action.</p></div>'+
+ '<div class="offer"><p style="font:800 12px Montserrat,sans-serif;margin:0">STARTS FRIDAY, JANUARY 8, 2027</p><h2 style="color:#fff">Launch Your First Real Project</h2><p>A 12-week Respectful Rebels cohort for 13 to 17 year olds. They plan, build and launch a real project to at least 10 real people, record a pitch and can apply for a scholarship to grow it, with peers in other countries cheering them on. A progress email for you every week. Founding price £197.</p><a href="[cohort link]">See the cohort</a></div>'+
+ '<div class="card"><h3>Joining the cohort?</h3><p class="note">Your teen can carry this quest into the Rebels Path app, only if they choose to.</p><button class="ghost" id="qcode">Copy my quest code</button> <button class="ghost" id="reset">Start over</button></div>';}
+
+var LIB=/library/.test(location.pathname)||location.hash==='#library';
+function libView(){
+  var L=window.__L||(window.__L={start:'b',interest:'game',corner:'fix',annoy:'wifi',help:'peers',work:'crew',strug:['time']});
+  var CP={make:{x:0,y:0},fix:{x:1,y:0},lead:{x:0,y:1},explore:{x:1,y:1},all:{x:.5,y:.5}};
+  var keep=S;S=Object.assign(blank(),{setup:true,start:L.start,interests:[L.interest],pos:CP[L.corner],annoy:L.annoy,help:L.help,work:L.work,strug:L.strug});
+  function sel(id,opts,val){var LB={start:'Starting point',interest:'Loves',corner:'Leans toward',annoy:'What bugs them',help:'Wants to help',work:'Works'};return '<label style="display:block;font-weight:700;font-size:14px">'+LB[id]+'<select data-l="'+id+'" style="display:block;width:100%;font:16px Nunito;padding:8px;border-radius:10px;border:2px solid #cdbfb3;margin-top:2px">'+opts.map(function(o){return '<option value="'+o[0]+'" '+(o[0]===val?'selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select></label>';}
+  var ctr='<div class="card" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">'+
+    sel('start',STARTOPT.map(function(o){return [o[2],o[3]];}),L.start)+sel('interest',INTERESTS,L.interest)+
+    sel('corner',CORNERS.map(function(c){return [c[0],c[1]];}).concat([['all','All-rounder (middle)']]),L.corner)+
+    sel('annoy',ANNOY,L.annoy)+sel('help',HELP,L.help)+sel('work',WORK,L.work)+
+    '<div style="grid-column:1/-1;font-size:14px"><b>Struggles:</b> '+STRUG.map(function(s){return '<label style="margin-right:10px"><input type="checkbox" data-s="'+s[0]+'" '+(L.strug.indexOf(s[0])>-1?'checked':'')+'> '+s[1]+'</label>';}).join('')+'</div></div>';
+  var ms=missions();
+  var h='<p class="note">Review copy for Jess · not part of the live app</p><h1>Quest Library</h1><p>Pick any combination of answers to see exactly what a teen would get. Every mission has three moves; struggle tips appear under each one.</p>'+ctr+
+   ms.map(function(m,i){return '<div class="card"><p class="note" style="margin:0">Mission '+(i+1)+' · '+BADGES[i]+' badge</p><h2>'+esc(m.t)+'</h2><p>'+esc(m.p)+'</p><div class="moves">'+m.mv.map(function(x){return '<div class="move">'+ART[x[0]]+'<b>'+esc(x[1])+'</b>'+esc(x[2])+'</div>';}).join('')+'</div>'+tipsFor()+'<p class="note">Dinner-table question: '+esc(m.q)+'</p></div>';}).join('');
+  var m1=['a','b','c'].map(function(k){S.start=k;return missions()[0];});
+  h+='<h2 style="margin-top:28px">Mission 1 for each starting point</h2>'+m1.map(function(m,i){return '<div class="card"><p class="note" style="margin:0">'+STARTOPT[i][3]+'</p><h3>'+esc(m.t)+'</h3><p>'+esc(m.p)+'</p><ul>'+m.mv.map(function(x){return '<li><b>'+esc(x[1])+':</b> '+esc(x[2])+'</li>';}).join('')+'</ul></div>';}).join('');
+  S=keep;app.innerHTML=h;
+  app.querySelectorAll('[data-l]').forEach(function(s){s.onchange=function(){L[s.dataset.l]=s.value;libView();};});
+  app.querySelectorAll('[data-s]').forEach(function(c){c.onchange=function(){var k=c.dataset.s,i=L.strug.indexOf(k);if(c.checked&&i<0)L.strug.push(k);if(!c.checked&&i>-1)L.strug.splice(i,1);libView();};});
+}
+/* ---------- time check-in: every visit starts by choosing how much time you have ---------- */
+var SESS=null;try{SESS=JSON.parse(sessionStorage.getItem('rq-sess')||'null');}catch(e){}
+function setSess(x){SESS=x;try{sessionStorage.setItem('rq-sess',JSON.stringify(x));}catch(e){}}
+var MODES=[['quick','time','1-minute check-in','See where you are. That’s it.',1],['jot','draw','A few minutes','Jot down an idea',5],['deep','rocket','Deep dive','Build your project',25]];
+function checkin(){
+  var h=hud()+'<h1>Hey Rebel. How much time do you have right now?</h1><p class="sub">You choose. Every amount counts, even one minute.</p><div class="tiles">'+MODES.map(function(m){return tile(m[0],ART[m[1]],m[2],m[3],(window.__mode||'')===m[0],'mode');}).join('')+'</div>';
+  if(window.__mode==='deep')h+='<p style="margin-top:14px"><b>How long is your deep dive?</b></p><div style="display:flex;gap:8px;flex-wrap:wrap">'+[15,25,45,60].map(function(n){var on=(window.__mins||25)===n;return '<button class="ghost" data-mins="'+n+'" aria-pressed="'+on+'" style="'+(on?'background:var(--action);color:#fff':'')+'">'+n+' min</button>';}).join('')+'</div>';
+  h+='<div class="foot"><span class="note">Your timer starts when you tap Go.</span><button class="btn" id="go" '+(window.__mode?'':'disabled')+'>Go →</button></div>';
+  app.innerHTML=h;
+  app.querySelectorAll('.tile').forEach(function(t){t.onclick=function(){window.__mode=t.dataset.v;checkin();};});
+  app.querySelectorAll('[data-mins]').forEach(function(b){b.onclick=function(){window.__mins=+b.dataset.mins;checkin();};});
+  document.getElementById('go').onclick=function(){var m=MODES.filter(function(x){return x[0]===window.__mode;})[0];setSess({mode:m[0],mins:m[0]==='deep'?(window.__mins||25):m[4],start:Date.now(),ext:0});if(m[0]==='deep')S.tab='map';save();render();tick();};
+}
+function left(){if(!SESS||!SESS.mins)return null;return Math.round(SESS.mins*60+SESS.ext*60-(Date.now()-SESS.start)/1000);}
+function fmtT(s){s=Math.max(0,s);return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
+var timerOn=false;
+function tick(){if(timerOn)return;timerOn=true;setInterval(function(){var el=document.getElementById('timer');var l=left();if(l==null)return;if(el)el.textContent='⏱ '+fmtT(l);if(l<=0&&!SESS.rang){SESS.rang=true;setSess(SESS);timeUp();}},1000);}
+function timeUp(){var d=document.createElement('div');d.className='toast';d.style.animation='none';d.innerHTML='Time’s up! <button class="ghost" id="more" style="background:#fff;margin-left:8px">+5 min</button> <button class="ghost" id="stop" style="background:#fff">Stop here</button>';document.body.appendChild(d);say('Time is up. Add 5 minutes or stop here.');
+  document.getElementById('more').onclick=function(){SESS.ext+=5;SESS.rang=false;setSess(SESS);d.remove();};
+  document.getElementById('stop').onclick=function(){d.remove();endSess();};}
+function endSess(){if(!SESS)return;var used=Math.max(1,Math.round((Date.now()-SESS.start)/60000)),planned=(SESS.mins||used)+SESS.ext;S.sessions.push({date:new Date().toISOString().slice(0,10),mode:SESS.mode,planned:planned,used:used});S.xp+=SESS.mode==='quick'?5:SESS.mode==='jot'?10:0;save();setSess(null);window.__mode=null;render();toast('Session saved: planned '+planned+' min, used '+used+'.');}
+function nextIdx(){for(var i=0;i<6;i++)if(!S.done[i])return i;return 5;}
+function quickView(){var m=missions()[nextIdx()];
+  return '<div class="card"><h2>Quick check-in</h2><p>How’s your project feeling today?</p><div class="tiles">'+[['face_spark','Excited'],['face_ok','Okay'],['face_stuck','Stuck'],['energy','Tired']].map(function(f){return tile(f[0],ART[f[0]],f[1],'',SESS.feel===f[0],'feelnow');}).join('')+'</div><p style="margin-top:14px"><b>Up next:</b> Mission '+(nextIdx()+1)+', '+esc(m.t)+'</p>'+(SESS.feel==='face_stuck'?'<div class="tip">'+ART.noidea+'<span>Stuck is normal. Next time, pick “A few minutes” and jot just one thing.</span></div>':'')+'<div class="foot"><span></span><button class="btn" id="end" '+(SESS.feel?'':'disabled')+'>Done ✓ +5 XP</button></div></div>';}
+function jotView(){var m=missions()[nextIdx()];
+  return '<div class="card"><h2>Jot it down</h2><p class="note">For Mission '+(nextIdx()+1)+': '+esc(m.t)+'</p><p>'+esc(m.p)+'</p><span class="inrow"><textarea id="jot" maxlength="400" rows="4" placeholder="Messy is perfect. Any language counts.">'+esc(SESS.text||'')+'</textarea>'+mic('jot')+'</span>'+VOICEHINT+'<div class="foot"><button class="ghost" id="todeep">Make it a deep dive</button><button class="btn" id="end">Save my jot +10 XP</button></div></div>'+
+   (S.jots.length?'<div class="card"><h3>Your jots</h3>'+S.jots.slice(-5).reverse().map(function(j){return '<p style="margin:6px 0"><span class="note">'+esc(j.date)+'</span><br>'+esc(j.text)+'</p>';}).join('')+'</div>':'');}
+function sessionsCard(){if(!S.sessions.length)return '';var tot=S.sessions.reduce(function(a,s){return a+s.used;},0),on=S.sessions.filter(function(s){return s.used<=s.planned+2;}).length;
+  return '<div class="card"><h3>My time</h3><p><b>'+S.sessions.length+' sessions · '+tot+' minutes</b> · finished on time '+on+' of '+S.sessions.length+'</p>'+S.sessions.slice(-6).reverse().map(function(s){return '<p class="note" style="margin:2px 0">'+esc(s.date)+' · '+({quick:'Check-in',jot:'Jot',deep:'Deep dive'})[s.mode]+' · planned '+s.planned+' min, used '+s.used+'</p>';}).join('')+'</div>';}
+function render(){
+  if(LIB)return libView();
+  if(!S.setup)return setup();
+  if(!SESS)return checkin();
+  if(SESS.mode!=='deep'){app.innerHTML=hud()+(SESS.mode==='quick'?quickView():jotView());
+    var he0=document.getElementById('hudend');if(he0)he0.onclick=endSess;
+    app.querySelectorAll('[data-g=feelnow]').forEach(function(t){t.onclick=function(){SESS.feel=t.dataset.v;setSess(SESS);render();};});
+    var j=document.getElementById('jot');if(j)j.oninput=function(){SESS.text=j.value;setSess(SESS);};
+    var td=document.getElementById('todeep');if(td)td.onclick=function(){if(SESS.text&&SESS.text.trim())S.jots.push({date:new Date().toISOString().slice(0,10),text:SESS.text.trim()});SESS.mode='deep';SESS.mins=25;SESS.start=Date.now();SESS.ext=0;SESS.rang=false;SESS.text='';setSess(SESS);S.tab='map';save();render();};
+    document.getElementById('end').onclick=function(){if(SESS.mode==='jot'&&SESS.text&&SESS.text.trim())S.jots.push({date:new Date().toISOString().slice(0,10),text:SESS.text.trim()});endSess();};
+    bindMics();tick();return;}
+
+  var body={compass:compass,map:quest,record:record,remix:remix}[S.tab]||quest;
+  app.innerHTML=hud()+tabs()+body();tick();
+  app.querySelectorAll('[data-tab]').forEach(function(b){b.onclick=function(){S.tab=b.dataset.tab;save();render();window.scrollTo(0,0);};});
+  app.querySelectorAll('[data-open]').forEach(function(g){var f=function(){S.open=+g.dataset.open;save();render();};g.onclick=f;g.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();f();}};});
+  app.querySelectorAll('[data-move]').forEach(function(b){b.onclick=function(){S.move[S.open]=+b.dataset.move;save();render();var p=document.getElementById('proof');if(p)p.focus();};});
+  app.querySelectorAll('[data-feel]').forEach(function(b){b.onclick=function(){S.feel[S.open]=b.dataset.feel;save();render();toast(b.dataset.feel==='right'?'Noted. Keep going!':'Noted for your remix');};});
+  var pr=document.getElementById('proof');if(pr)pr.oninput=function(){S.proof[S.open]=pr.value;save();};
+  var did=document.getElementById('did');if(did)did.onclick=function(){var i=S.open;S.done[i]=new Date().toISOString().slice(0,10);S.xp+=30;if(i<5)S.open=i+1;save();render();toast('★ '+BADGES[i]+' badge · +30 XP');};
+  app.querySelectorAll('[data-undo]').forEach(function(b){b.onclick=function(){delete S.done[+b.dataset.undo];S.xp=Math.max(0,S.xp-30);save();render();};});
+  bindMics();
+  var xc=document.getElementById('xpchip');if(xc)xc.onclick=function(){S.tab='compass';save();render();setTimeout(function(){var c=[].slice.call(app.querySelectorAll('h2')).filter(function(h){return /XP/.test(h.textContent);})[0];if(c)c.scrollIntoView();},50);};
+  var cc=document.getElementById('copycard');if(cc)cc.onclick=function(){copy(window.__card,cc);};
+  var he=document.getElementById('hudend');if(he)he.onclick=endSess;
+  var rd=document.getElementById('redo');if(rd)rd.onclick=function(){S.setup=false;S.step=0;save();render();};
+  var cr=document.getElementById('copyrec');if(cr)cr.onclick=function(){copy(app.querySelector('.card').innerText,cr);};
+  var cp=document.getElementById('copypr');if(cp)cp.onclick=function(){copy(promptText(),cp);};
+  var qc=document.getElementById('qcode');if(qc)qc.onclick=function(){var d={v:2,start:S.start,interests:S.interests,pos:S.pos,annoy:S.annoy,own:S.own,help:S.help,strug:S.strug,work:S.work,done:S.done,move:S.move,proof:S.proof,feel:S.feel};copy('REBELQUEST:'+btoa(unescape(encodeURIComponent(JSON.stringify(d)))),qc);};
+  var rs=document.getElementById('reset');if(rs)rs.onclick=function(){if(rs.dataset.sure){try{localStorage.removeItem(KEY);}catch(e){}S=blank();render();}else{rs.dataset.sure=1;rs.textContent='Tap again to erase everything';}};
+}
+function copy(t,btn){var ok=function(){btn.textContent='Copied ✓';};try{navigator.clipboard.writeText(t).then(ok,function(){fb(t);ok();});}catch(e){fb(t);ok();}}
+function fb(t){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');}catch(e){}a.remove();}
+render();
+}
+</script>
+</body>
+</html>
