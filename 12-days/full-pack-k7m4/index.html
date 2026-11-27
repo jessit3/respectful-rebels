@@ -1,0 +1,762 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>12 Days of Rebels</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout concept: a night-window tree on the left fills up as scrolls are cracked; twelve day tiles on the right; each day is one focused puzzle sheet with a hint ladder underneath. */
+:root{
+  --ground:#e6edf2;--panel:#f7fafc;--ink:#12212c;--mute:#465c6b;--line:#bfcfda;
+  --accent:#f0b24a;--accent-ink:#7a4300;--pine:#1f6b4f;--ok:#17653e;--okbg:#dcefe4;
+  --warn:#7a4300;--warnbg:#fbeed3;--field:#ffffff;--night:#0f2233;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-head:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;
+  --f-mono:"DM Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0a141c;--panel:#122230;--ink:#e8f0f5;--mute:#9db3c0;--line:#26394a;
+  --accent:#f0b24a;--accent-ink:#f0b24a;--pine:#5cc4a0;--ok:#86dcb2;--okbg:#12301f;
+  --warn:#f0c574;--warnbg:#2c2410;--field:#0d1923;--night:#0b1a29;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ground:#0a141c;--panel:#122230;--ink:#e8f0f5;--mute:#9db3c0;--line:#26394a;
+  --accent:#f0b24a;--accent-ink:#f0b24a;--pine:#5cc4a0;--ok:#86dcb2;--okbg:#12301f;
+  --warn:#f0c574;--warnbg:#2c2410;--field:#0d1923;--night:#0b1a29;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:1.0625rem/1.6 var(--f-body)}
+main{max-width:1040px;margin:0 auto;padding-block:14px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-head);font-weight:800;line-height:1.15;margin:0 0 .5rem;text-wrap:balance}
+h1{font-size:clamp(1.6rem,4.5vw,2.3rem)}h2{font-size:1.35rem}h3{font-size:1.1rem}
+p{margin:0 0 .8rem}
+a{color:var(--accent-ink)}
+.mute{color:var(--mute)}.small{font-size:.875rem}
+.eyebrow{font:500 .75rem/1.2 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 .5rem}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hud{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:6px 0 14px}
+.brand{font:800 1.15rem var(--f-head);color:var(--ink);text-decoration:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;gap:6px;align-items:baseline;padding:.25em .75em;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:.9rem;font-variant-numeric:tabular-nums}
+.chip b{font:500 .72rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px}
+.btn{font:inherit;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:.5em 1.1em;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#1a1204;cursor:pointer;text-decoration:none}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--field);border:2px solid var(--line);border-radius:10px;padding:.5em .7em;min-height:46px;max-width:100%}
+input[type=text]{flex:1;min-width:150px}
+textarea{width:100%;min-height:96px;resize:vertical}
+select{width:100%}
+.back{display:inline-block;margin:0 0 12px;font-weight:700}
+.home{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:840px){.home{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}}
+.scene{background:var(--night);border-radius:14px;padding:10px;border:1px solid var(--line)}
+.scene svg{display:block;width:100%;height:auto}
+.dec{opacity:.18;transition:opacity .6s}.dec.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.dec{transition:none}}
+.msgstrip{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0 2px}
+.cell{width:30px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid #38566d;border-radius:6px;font:500 1.05rem var(--f-mono);color:#f6d58f}
+.cell.gap{width:14px;border:0}
+.cell.off{color:#59778c}
+.days{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.tile{display:flex;flex-direction:column;gap:2px;padding:12px;border:2px solid var(--line);border-radius:12px;background:var(--panel);color:var(--ink);text-decoration:none;min-height:104px}
+a.tile:hover{border-color:var(--accent)}
+.tile .n{font:500 .75rem var(--f-mono);letter-spacing:.08em;color:var(--mute)}
+.tile .t{font:800 1.05rem/1.2 var(--f-head)}
+.tile .a{font-size:.85rem;color:var(--mute)}
+.tile .s{margin-top:auto;font-size:.82rem;font-weight:700}
+.tile.solved{border-color:var(--ok);background:var(--okbg)}
+.tile.solved .s{color:var(--ok)}
+.tile.locked{opacity:.62}
+.tile.today{border-color:var(--accent)}
+.story{margin:0 0 16px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--warnbg);border-radius:0 8px 8px 0}
+.story .who{display:block;font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--warn);margin-bottom:4px}
+ol.case{padding-left:1.3rem;margin:.4rem 0 1rem}
+ol.case li{margin-bottom:.45rem}
+ol.case b{font-weight:700}
+.list{padding-left:1.2rem;margin:.3rem 0 1rem}
+.task{font-weight:700}
+table.data{border-collapse:collapse;width:100%;max-width:420px;margin:.5rem 0 1rem;font-variant-numeric:tabular-nums}
+table.data th,table.data td{border:1px solid var(--line);padding:6px 10px;text-align:right}
+table.data th{background:var(--ground);font-weight:700}
+.slots,.pool{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.slots{flex-direction:column}
+.slot{display:flex;gap:10px;align-items:flex-start;min-height:46px;padding:8px 10px;border:2px dashed var(--line);border-radius:10px;text-align:left;font:inherit;color:var(--ink);background:transparent}
+.slot .k{font:500 .8rem var(--f-mono);color:var(--mute);min-width:1.4em}
+button.slot.full{border-style:solid;border-color:var(--accent);background:var(--panel);cursor:pointer}
+.slots.tiles{flex-direction:row}
+.slots.tiles .slot{align-items:center}
+.card{font:inherit;text-align:left;color:var(--ink);background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:8px 12px;min-height:46px;cursor:pointer}
+.card:hover{border-color:var(--accent)}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--warnbg)}
+.matchrow{display:grid;gap:4px;margin-bottom:12px}
+.matchrow label{font-weight:700}
+.msg{min-height:1.5em;margin:10px 0 0;color:var(--mute)}
+.hints{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.rung{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--ground)}
+.rung b{display:block;font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
+.win{border-color:var(--ok);background:var(--okbg)}
+.keywon{display:flex;gap:14px;align-items:center;margin-bottom:10px}
+.keybox{width:76px;height:76px;border-radius:14px;background:var(--night);color:#f6d58f;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.keybox .L{font:800 1.9rem/1 var(--f-head)}
+.keybox .gl{color:#f6d58f;width:22px;height:27px}
+@media (prefers-reduced-motion:no-preference){.keybox{animation:pop .5s ease-out}@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.08)}100%{transform:scale(1)}}}
+.gl{width:30px;height:37px;color:var(--ink);display:inline-block;vertical-align:middle}
+.strip{display:flex;flex-wrap:wrap;gap:4px;margin:.5rem 0 1rem}
+.strip .gl{width:34px;height:42px}
+.keytable{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:.6rem 0}
+.keyc{display:flex;flex-direction:column;align-items:center;padding:6px 2px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font:500 .8rem var(--f-mono)}
+details{margin:.6rem 0 1rem;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+summary{cursor:pointer;font-weight:700;min-height:32px;display:flex;align-items:center}
+.candles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:.5rem 0 1rem}
+.candle{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.candle .lab{font-weight:700}
+.cert{border:2px solid var(--accent);text-align:center}
+.cert .big{font:800 clamp(1.6rem,6vw,2.4rem) var(--f-head)}
+.stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:.875rem;color:var(--mute);display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.foot label{display:flex;gap:6px;align-items:center}
+.foot input[type=checkbox]{width:20px;height:20px}
+.steps{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin:.6rem 0 0;padding:0;list-style:none}
+.steps li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--ground)}
+
+/* Gifts, animation and countdown */
+.tile{align-items:center;text-align:center;min-height:0;padding:10px 8px 12px}
+.days{grid-template-columns:repeat(auto-fill,minmax(138px,1fr))}
+.gift{display:block;width:100%;max-width:124px;height:auto;margin:0 auto 6px;overflow:visible}
+.tile .s{margin-top:4px}
+.tile.locked .gift{filter:saturate(.35) brightness(.95)}
+.badge circle{fill:#fbbf1c;stroke:#2b1a12;stroke-width:2}
+.badge text{font:800 14px var(--f-head);fill:#2b1a12;text-anchor:middle}
+.lid{transform-box:fill-box;transform-origin:0 100%;transition:transform .8s cubic-bezier(.3,1.5,.5,1)}
+.gift.open .lid{transform:translate(9px,-15px) rotate(15deg)}
+.sp{opacity:0;transform-box:fill-box;transform-origin:center}
+.gift.open .sp{opacity:1}
+.count{text-align:center;margin-bottom:14px}
+.clock{font:500 clamp(1.8rem,7vw,2.6rem)/1.1 var(--f-mono);letter-spacing:.04em;font-variant-numeric:tabular-nums;margin:2px 0 8px;color:var(--ink)}
+.tw,.fl,.sw,.spin,.glow,.bob,.snow,.march,.shim{transform-box:fill-box}
+.tw,.glow,.spin{transform-origin:center}.fl{transform-origin:50% 100%}.sw{transform-origin:50% 0}.bob{transform-origin:50% 100%}
+@keyframes tw{0%,100%{opacity:.35;transform:scale(.7)}50%{opacity:1;transform:scale(1.3)}}
+@keyframes fl{0%{transform:scale(1,1) rotate(-3deg)}35%{transform:scale(.9,1.14) rotate(3deg)}70%{transform:scale(1.06,.92) rotate(-2deg)}100%{transform:scale(.95,1.08) rotate(2deg)}}
+@keyframes sw{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{transform:scale(.94);opacity:.85}50%{transform:scale(1.14);opacity:1}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes snow{0%{transform:translate(0,-10px)}100%{transform:translate(16px,350px)}}
+@keyframes march{to{stroke-dashoffset:-60}}
+@keyframes shim{to{stroke-dashoffset:-50}}
+@keyframes wig{0%,55%,100%{transform:rotate(0)}65%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}85%{transform:rotate(-3deg)}}
+@media (prefers-reduced-motion:no-preference){
+ .dec.on .tw{animation:tw 1.6s ease-in-out infinite}
+ .dec.on .fl,.candle .fl{animation:fl .6s ease-in-out infinite alternate}
+ .dec.on .sw{animation:sw 3s ease-in-out infinite alternate}
+ .dec.on .spin{animation:spin 9s linear infinite}
+ .dec.on .glow{animation:glow 2.4s ease-in-out infinite}
+ .dec.on .bob{animation:bob 2s ease-in-out infinite}
+ .dec.on .march{animation:march 2.6s linear infinite}
+ .dec.on .shim{animation:shim 1.8s linear infinite}
+ .snow{animation:snow 9s linear infinite}
+ .gift.open .sp{animation:tw 1.4s ease-in-out infinite}
+ .tile.today .gift{animation:wig 2.8s ease-in-out infinite;transform-origin:50% 100%}
+ a.tile:hover .gift{animation:wig 1s ease-in-out;transform-origin:50% 100%}
+}
+
+/* Landing page */
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.nav{position:static}
+.navlinks{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.navlinks a:not(.btn){color:var(--ink);font-weight:700;text-decoration:none}
+.navlinks a:not(.btn):hover{text-decoration:underline}
+.navlinks .btn{min-height:40px;padding:.3em .9em}
+@media (max-width:760px){.navlinks a:not(.btn){display:none}}
+.hero{display:grid;gap:20px;align-items:center;grid-template-columns:minmax(0,1fr);padding:10px 0 24px}
+@media (min-width:820px){.hero{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}}
+.hero h1{font-size:clamp(2rem,6vw,3.1rem);line-height:1.05;text-wrap:balance}
+.lead{font-size:1.15rem;max-width:56ch}
+.heroart{max-width:380px;width:100%;margin:0 auto}
+.cipher{position:relative;margin:0;padding:22px 18px 18px;border:2px solid var(--accent);border-radius:18px;background:linear-gradient(160deg,var(--panel),var(--warnbg));text-align:center;overflow:hidden}
+.crow{display:flex;justify-content:center;gap:5px;margin:8px 0}
+.cg{display:flex;align-items:center;justify-content:center;width:40px;height:50px;border:1.5px solid var(--line);border-radius:8px;background:var(--field)}
+.cg .gl{width:32px;height:40px;color:var(--ink)}
+.cipher .cap{margin:10px 0 0;font-weight:700}
+.spk{position:absolute;color:var(--accent);transform-origin:center}
+.chips2{list-style:none;display:flex;flex-wrap:wrap;gap:8px;padding:0;margin:12px 0}
+.chips2 li{padding:6px 12px;border:1.5px solid var(--accent);border-radius:999px;background:var(--panel);font-weight:700;font-size:.95rem}
+.day1{display:grid;gap:16px;align-items:center;grid-template-columns:minmax(0,1fr)}
+@media (min-width:600px){.day1{grid-template-columns:150px minmax(0,1fr)}}
+.g1 .gift{max-width:150px}
+.band{padding:22px 0;border-top:1px solid var(--line);scroll-margin-top:12px}
+.cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin:12px 0}
+.info{padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.info p{margin:0}
+.two{display:grid;gap:14px;grid-template-columns:minmax(0,1fr);margin-top:6px}
+@media (min-width:760px){.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.offer{border:2px solid var(--accent);margin:0}
+.upsell{border:2px dashed var(--pine);margin:0}
+.tag{display:inline-block;padding:3px 10px;border-radius:999px;background:var(--accent);color:#1a1204;font:700 .75rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase}
+.tag.alt{background:var(--okbg);color:var(--ok);border:1px solid var(--pine)}
+.ticks{padding-left:1.1rem;margin:.6rem 0 1rem}
+.ticks li{margin-bottom:6px}
+.thread{margin:0;padding:14px;border:1px dashed var(--line);border-radius:12px;background:var(--panel)}
+.thread figcaption{font:500 .72rem var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.bubble{margin:0 0 8px;padding:8px 12px;border-radius:12px;background:var(--ground);max-width:92%}
+.bubble.r{margin-left:auto;background:var(--warnbg)}
+.safe{padding:14px;border:2px solid var(--ok);border-radius:12px;background:var(--okbg)}
+.safe ul{margin:0;padding-left:1.2rem}
+.safe li{margin-bottom:4px}
+@keyframes cgl{0%,100%{border-color:var(--line);transform:translateY(0)}50%{border-color:var(--accent);transform:translateY(-3px)}}
+@keyframes spk{0%,100%{opacity:.25;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(25deg)}}
+@media (prefers-reduced-motion:no-preference){.cg{animation:cgl 3.2s ease-in-out infinite}.spk{animation:spk 2.2s ease-in-out infinite}}
+
+/* Accessibility */
+.a11y{margin:0 0 12px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.a11y summary{cursor:pointer;font-weight:700;min-height:28px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.ctl .btn{min-height:40px;padding:.3em .9em}
+.ctl .btn[aria-pressed="true"]{border-color:var(--accent);background:var(--warnbg)}
+.listen{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.listen .btn{min-height:40px}
+[data-calm="1"] *,[data-calm="1"] *::before,[data-calm="1"] *::after{animation:none!important;transition:none!important}
+.ic{width:20px;height:20px;flex:none}
+.lab{display:inline-flex;align-items:center;gap:6px;font-weight:700;min-width:9.5em}
+.a11y summary{display:flex;align-items:center;gap:8px}
+.intro h1{font-size:clamp(2rem,6vw,3rem);line-height:1.05}
+.intro .lead{font-size:1.2rem;max-width:56ch}
+.xl{list-style:none;padding:0;margin:.6rem 0 0;display:grid;gap:10px}
+.xl li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.xl a{font-weight:700}
+.extra{border:2px dashed var(--accent)}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<g id="g-adv" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-16 -7L0 -15L0 15L-16 7Z"/><path d="M7 -8Q13 0 7 8"/><path d="M12 -13Q21 0 12 13"/></g>
+<g id="g-inq" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-10 -9Q-10 -19 0 -19Q10 -19 10 -9Q10 0 0 4L0 10"/><path d="M-5 17L5 17"/></g>
+<g id="g-con" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="-11" cy="0" r="7"/><circle cx="11" cy="0" r="7"/><path d="M-4 0L4 0"/></g>
+<g id="g-tra" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M0 18L0 -18M0 2L-14 -14M0 2L14 -14"/></g>
+<g id="g-pat" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M0 -19L11 0L0 19L-11 0ZM-11 0L11 0"/></g>
+<g id="g-inn" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="-5" r="11"/><path d="M-5 10L5 10M-4 15L4 15"/></g>
+<g id="g-cat" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M0 -19L4 -4L19 0L4 4L0 19L-4 4L-19 0L-4 -4Z"/></g>
+<g id="g-exp" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-16 6A16 16 0 0 1 16 6M-21 6L21 6M-8 13L8 13M0 -14L0 -20M-13 -7L-17 -11M13 -7L17 -11"/></g>
+<g id="g-chg" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0,-6)"><path d="M-8 12A8 8 0 0 1 8 12M-15 12A15 15 0 0 1 15 12M-22 12A22 22 0 0 1 22 12"/><circle cx="0" cy="12" r="2.5" fill="currentColor"/></g></g>
+</defs></svg>
+
+<main>
+<div id="app"></div>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Settings you can change ---------- */
+var CFG={
+  start:[2026,11,1],    /* first day of the 12 (year, month 0-11, day) */
+  signup:"https://go.respectfulrebels.com/",            /* link to the January program sign-up page */
+  book:"",              /* link to The Rebels' Handbook */
+  codes:[],             /* access codes for Days 2-12, e.g. ["REBEL12"]. Empty = all days open. */
+                 /* link to buy or join the full 12 days (used by the taster) */
+  form:"https://rebels.quest/12-days-of-rebels-form",   /* every sign-up button goes here */
+  community:"",         /* link or join instructions for the moderated community (e.g. Google Classroom) */
+  schools:""            /* link for schools and youth groups to ask about group access */
+};
+
+var TASTER=false;
+var KEY="rebels-12days-v1";
+var SIG=["adv","inq","con","tra","pat","inn","cat","exp","chg"];
+var LET=["S","T","A","R","T","A","R","I","P","P","L","E"];
+var MSG=[1,2,3,4,5,0,6,0,7,8,9,10,11,12];
+var XPS=[100,90,75,55];
+var RUNG=["Nudge","Narrow","Method"];
+var RANKS=[[0,"Newcomer"],[200,"Tinkerer"],[500,"Rebel"],[900,"Trailblazer"],[1400,"Changemaker"]];
+var WRONG=["Not yet. Check one piece of your thinking and try again.","Close attempts count. Try it from a different angle.","Still no pressure. A hint costs a few XP, never your progress."];
+
+/* ---------- The twelve puzzles ---------- */
+var P=[
+{dec:"Tree stand",arch:"Advocate",title:"Who’s missing?",letter:"S",bonus:"seen",
+ story:"The tree needs a strong stand before anything hangs on it. Tonight Frostbridge votes on switching on the Winter Lights. These are the minutes of the meeting. Someone important is missing from them. Find out who.",
+ lines:[["Shopkeeper","Shoppers flood in every December, and by 6 a.m. the pavement outside is spotless again."],["Parent","Walking home under the lights feels safer in the dark."],["Teacher","Every class makes lanterns for the switch-on parade."],["Councillor","Even so, £4,000 is a lot, and the clean-up after the crowds costs extra."],["Bus driver","Passengers cheer up when the lights come on along my route."],["Elder","Each morning after the parade I see someone with a broom, working alone."],["Volunteer","Running the switch-on raised £900 last year, but we could never manage the morning-after mess ourselves."]],
+ task:"Someone is affected by the lights, but nobody asked them. What is their job?",
+ type:"text",ph:"Their job",ans:["sweeper","sweepers","streetsweeper","streetsweepers","streetcleaner","streetcleaners","cleaner","roadsweeper"],
+ answerText:"Street sweeper",
+ why:"The first letters of the seven lines spell SWEEPER. People who do invisible work are often the last to be asked.",
+ hints:["Four people mention work done before dawn without saying who does it. Who?","Read the first letter of each person’s line, from top to bottom.","Try the trick on another meeting. The lines begin B, A, K, E, R: “Big crowds are coming to the fair.” “All the stalls are booked.” “Kids are making banners.” “Every parent is bringing food.” “Raffle tickets sell fast.” The hidden word is BAKER, the person who will feed the fair and was never asked. Now do the same for Frostbridge."],
+ lesson:"Ask three questions in any group: Who is affected? Who is speaking? Who is missing? Advocates work in the gap.",
+ ref:"Think of a place you belong. Who does invisible work there? Write one sentence you would say to them.",
+ refAlt:"Think of a character in a book or game who works unseen. What would you say to them?",
+ share:"Day 1: I spotted the missing voice."},
+
+{dec:"Lights",arch:"Inquirer",title:"Why do the lights keep going out?",letter:"T",bonus:"why",
+ story:"Frostbridge switched on its lights, and by 5 p.m. they went out. I kept five cards about it. They are out of order. Put them in a chain, from what you can see to the real reason.",
+ task:"Put the cards in order. Each card must be the reason for the card before it.",
+ type:"order",cards:["At 5 p.m. every evening the Winter Lights go out.","The circuit breaker trips at 5 p.m.","Too many things are plugged into one power point at that time.","The stall holders switch on their heaters when the night market opens.","Nobody planned the power supply for the new night market."],perm:[3,0,4,2,1],
+ answerText:"Lights out, breaker trips, one overloaded power point, stall heaters, no power plan",
+ why:"Each card answers “why?” about the card above it. The last one is something people can fix: plan the power supply.",
+ hints:["Start with what you could see from the street. End with what nobody planned.","The first card is the symptom. Ask “why?” and find the card that answers it. Then ask again.","Example chain: Puddle on the floor, then The pipe is leaking, then The pipe is very old, then Nobody checks the pipes. Each card answers “why?” about the one above."],
+ lesson:"Five Whys: ask “Why?” up to five times. Stop when the answer is something a person can change.",
+ ref:"Which rule or habit do you follow without knowing why it exists?",
+ refAlt:"Think of a character in a story who follows a rule without asking why. What goes wrong?",
+ share:"Day 2: I asked why until I found the root."},
+
+{dec:"Garland",arch:"Connector",title:"Link the lights",letter:"A",bonus:"link",
+ story:"A garland links one light to the next. Four people in your life each notice a different strength in you. Match every person to their strength. No strength is used twice.",
+ clues:["The Cousin notices Funny.","The Coach does not notice Funny or Brave.","The Librarian does not notice Brave or Patient.","The Neighbor does not notice Patient."],
+ task:"Choose one strength for each person.",
+ type:"match",opts:["Funny","Brave","Patient","Organized"],rows:[{l:"Coach",a:2},{l:"Neighbor",a:1},{l:"Librarian",a:3},{l:"Cousin",a:0}],
+ answerText:"Coach: Patient. Neighbor: Brave. Librarian: Organized. Cousin: Funny.",
+ why:"Start with the clue that names one strength (Cousin = Funny). Cross it off everyone else, then keep removing what cannot be true.",
+ hints:["Start with the clue that names exactly one strength.","The Cousin has Funny, so nobody else can. Cross Funny off every other row.","Mini example: three friends with Kind, Bold, Calm. “Ava is not Kind or Bold” means Ava is Calm. Cross Calm off the others. Repeat."],
+ lesson:"Connectors notice what other people bring. Saying a strength out loud strengthens the link.",
+ ref:"Which two people in your life would you introduce to each other, and why?",
+ refAlt:"Which two characters from a story or game would make the best team, and why?",
+ share:"Day 3: I linked the lights with logic."},
+
+{dec:"Snowflake",arch:"Trailblazer",title:"Option C",letter:"R",bonus:"path",
+ story:"The workshop door has a three-digit lock. Two guesses already failed: 126 and 351. Both are wrong. There is a third way in, Option C. Find it.",
+ clues:["The three digits add up to 9.","The hundreds digit is double the units digit.","The tens digit is odd."],
+ task:"What is the code? Check your answer against all three clues.",
+ type:"text",ph:"Three digits",ans:["432"],
+ answerText:"432",
+ why:"Both failed guesses add up to 9, so that clue alone is not enough. Use all three clues together and only one code is left: 4 + 3 + 2 = 9, 4 is double 2, and 3 is odd.",
+ hints:["Both failed guesses add up to 9. So the first clue alone cannot tell you the answer. Use all three together.","The hundreds digit is double the units digit. The pairs that work are 2 and 1, 4 and 2, 6 and 3, 8 and 4.","Mini example: digits add to 6, hundreds is double units, tens is odd. Pair 2 and 1 leaves 3 for the tens: 231. Pair 4 and 2 leaves 0, which is not odd. Now do the real one."],
+ lesson:"Trailblazers do not pick between two bad doors. They use every clue to build a third.",
+ ref:"Where do you feel stuck between two bad choices? Write three possible Option Cs.",
+ refAlt:"Think of a character stuck between two bad choices. What is their Option C?",
+ share:"Day 4: I found Option C."},
+
+{dec:"Candle",arch:"Pathfinder",title:"The compass candles",letter:"T",bonus:"flame",
+ story:"Four candles stand for Kind, Wise, Helpful and Honest. I count each flame in Maya dots and bars. A dot is worth 1 and a bar is worth 5. The compass needle points to the biggest flame. The lock code is the total of the other three.",
+ vals:[["Kind",7],["Wise",12],["Helpful",3],["Honest",8]],
+ task:"What is the lock code?",
+ type:"text",ph:"A number",ans:["18"],
+ answerText:"18 (Wise is biggest at 12. The others are 7 + 3 + 8.)",
+ why:"The flames read 7, 12, 3 and 8. Wise is the biggest, so the needle points to it. The other three add up to 18.",
+ hints:["A bar is 5. A dot is 1. Read each flame and write four numbers.","Find the biggest number and cross it out. The code uses the other three.","Mini example: flames of one bar and one dot (6), two dots (2), one bar (5). The biggest is 6. The other two add up to 7."],
+ lesson:"Pathfinders test a choice against four values: is it Kind? Wise? Helpful? Honest? The hard moments are when two of them disagree.",
+ ref:"Which of the four is hardest to keep when it costs you something?",
+ refAlt:"Which of the four does a character you admire find hardest, and why?",
+ share:"Day 5: I read the compass."},
+
+{dec:"Popcorn string",arch:"Innovator",title:"The scrambled question",letter:"A",bonus:"idea",
+ story:"The night market from Day 2 still has a power problem. I wrote the question that could fix it on popcorn kernels, but the words got scrambled. Rebuild the “How might we” question.",
+ task:"Tap the words in the right order to rebuild the question.",
+ type:"order",layout:"tiles",cards:["How","might","we","share","the","power","so","every","stall","stays","lit"],perm:[4,9,1,7,0,10,3,6,2,8,5],
+ answerText:"How might we share the power so every stall stays lit",
+ why:"A good “How might we” question is open (it has many answers) and names the result people want.",
+ hints:["Every “How might we” question starts with the same three words.","After those three comes an action. The result people want comes last, after the word “so”.","Mini example: “How might we make mornings less rushed”. First the starter, then the action, then the thing, then the goal."],
+ lesson:"Innovators turn complaints into questions. “The power keeps failing” becomes “How might we share the power?”",
+ ref:"Rewrite one thing that annoys you as a “How might we” question.",
+ refAlt:"Pick a problem in a story or game you know. Write it as a “How might we” question.",
+ share:"Day 6: I turned a problem into a question."},
+
+{dec:"Tinsel",arch:"Catalyst",title:"The cocoa stall",letter:"R",bonus:"sell",
+ story:"Time to test a small idea. A stall sells hot cocoa at the market. Each cup costs 60p to make. The stall tried four prices on four nights.",
+ cost:0.6,table:[[1.5,40],[2,30],[2.5,18],[3,10]],
+ task:"Which price makes the most profit, and how much profit is that in pounds? Enter the profit.",
+ type:"text",ph:"Profit in pounds",ans:["42","4200"],
+ answerText:"£42 at a price of £2.00",
+ why:"Profit per cup is price minus 60p, multiplied by cups sold: £36.00, £42.00, £34.20 and £24.00. The middle price wins. The highest price is not always the best.",
+ hints:["Profit per cup is the price minus 60p. Then multiply by the cups sold.","Work it out for all four rows and compare.","Mini example: price £1.00 and 50 cups. Profit per cup is 40p. 40p times 50 is £20."],
+ lesson:"Catalysts test small first: one stall, one price, one night. Small tests teach quickly.",
+ ref:"What would you offer or sell, and what is the smallest first step?",
+ refAlt:"Think of a character with a small business. What would they test first?",
+ share:"Day 7: I tested a price."},
+
+{dec:"Baubles",arch:"Explorer",title:"Winter around the world",letter:"I",bonus:"world",
+ story:"Baubles from around the world hang on my tree. Each shows a winter celebration in December. Put them in date order in your head, then count the days.",
+ cards:[["Santa Lucia Day, Sweden","13 December. People wear crowns of candles."],["Las Posadas, Mexico","Starts 16 December. Neighbors walk in a procession for nine nights."],["Yalda Night, Iran","Around 21 December, the longest night. Families share fruit and poetry."],["Hogmanay, Scotland","31 December. Neighbors visit just after midnight."]],dates:[13,16,21,31],
+ task:"How many days pass from the first celebration to the last?",
+ type:"text",ph:"Number of days",ans:["18"],
+ answerText:"18 days (13 December to 31 December)",
+ why:"The earliest is 13 December and the latest is 31 December. 31 minus 13 is 18.",
+ hints:["All four celebrations are in December. Find the earliest and the latest date.","The earliest is on the 13th. The latest is on the 31st.","Mini example: first on 3 December and last on 20 December. 20 minus 3 is 17 days."],
+ lesson:"Explorers notice what is different and what is shared. Many places mark the dark of winter with light, food and company.",
+ ref:"What would surprise a visitor about how you celebrate winter, or any season?",
+ refAlt:"Describe a celebration from a story, game or film that you would like to visit.",
+ share:"Day 8: I explored winter around the world."},
+
+{dec:"Gifts",arch:"Skills lab",title:"Wrap your skills",letter:"P",bonus:"skill",
+ story:"Under the tree are four gifts. Each gift is a chore that hides a real skill. Match every chore to the sentence a CV (a job application summary) would use for it.",
+ task:"Match each chore to its CV line.",
+ type:"match",opts:["Interpreted between two languages in a medical setting.","Coached a younger learner weekly in maths, improving their confidence.","Diagnosed and fixed network faults for a household of five, restoring access in 15 minutes.","Planned and cooked meals for four within a fixed £15 budget."],
+ rows:[{l:"Fixing the family Wi-Fi",a:2},{l:"Translating for a grandparent at the doctor",a:0},{l:"Cooking dinner for four with £15",a:3},{l:"Helping a younger sibling with maths homework",a:1}],
+ answerText:"Wi-Fi: network faults. Translating: interpreted. Cooking: £15 budget. Sibling: coached in maths.",
+ why:"A CV line names the skill, not the chore, and it uses numbers and places where it can.",
+ hints:["Look for a number, a tool or a place that appears in both the chore and the CV line.","Start with the one that mentions two languages.","Example: the chore “Walking the neighbor’s dog every day” becomes “Provided reliable daily care for a pet over six months.”"],
+ lesson:"Everyday jobs build real skills. Name them the way an employer would: what you did, for whom, and with what result.",
+ ref:"Rewrite three of your own chores or favorite hobbies as skills.",
+ refAlt:"Pick a character you like. What skills do their everyday jobs show?",
+ share:"Day 9: I turned chores into skills."},
+
+{dec:"Fireside",arch:"Story lab",title:"Tell the tale",letter:"P",bonus:"story",
+ story:"By the fire, the best stories have four beats: a Spark that starts it, a Struggle that gets in the way, Stakes that show why it matters, and a Shift where something changes. These four lines are jumbled.",
+ task:"Put the lines in story order: Spark, Struggle, Stakes, Shift.",
+ type:"order",cards:["One cold night, Noor spotted a tiny kitten shivering under the bus shelter.","She had no money for a vet, and every shop on the street was already closed.","If she waited until morning, the frost might be too much for such a small animal.","So she wrapped the kitten in her scarf and knocked on the night pharmacy door, where a kind worker called a local rescue."],perm:[2,0,3,1],
+ answerText:"Spark, Struggle, Stakes, Shift",
+ why:"The Spark starts the story, the Struggle blocks it, the Stakes say why it matters, and the Shift shows someone acting.",
+ hints:["Which line introduces something new? That is the Spark, and it comes first.","The order is: what happens, what gets in the way, why it matters, what changes.","Mini example: “A storm knocked out the lights” (Spark). “The torch had no batteries” (Struggle). “The little ones were scared” (Stakes). “Mia sang until the power came back” (Shift)."],
+ lesson:"Spark, Struggle, Stakes, Shift: four beats make a story people remember. Use them for a talk, a CV story or an interview.",
+ ref:"Write three sentences from a story of your own: one Spark, one Struggle and one Shift.",
+ refAlt:"Retell a film or game story you like in four beats.",
+ share:"Day 10: I put a story in order."},
+
+{dec:"Midnight wish",arch:"Goals lab",title:"The SMART wish",letter:"L",bonus:"goal",
+ story:"It is almost midnight on 31 December. I can grant one wish for 2027, but only a SMART wish gets through the door: Specific, Measurable, Achievable, Relevant and Time-bound.",
+ task:"Which wish is SMART?",
+ type:"pick",correct:2,opts:["Get better at drawing.","Become a YouTuber with a million subscribers by next Friday.","Learn 10 new guitar chords by 31 March 2027 by practicing 15 minutes on school days.","Practice guitar a lot more in 2027.","Learn every song The Beatles ever wrote in one month."],perm:[3,0,2,4,1],
+ flags:[[0,0,1,1,0],[1,1,0,1,1],[1,1,1,1,1],[0,0,1,1,1],[1,1,0,1,1]],
+ answerText:"Learn 10 new guitar chords by 31 March 2027 by practicing 15 minutes on school days.",
+ why:"It names the skill (guitar chords), has a number (10), is realistic, and has a date (31 March 2027) and a routine. The others miss a number, a date or realism.",
+ hints:["A SMART wish has a number and a date.","Cross out any wish with no number or no date. Then cross out any wish that is not realistic.","Check the survivors against the five letters one at a time. Which one passes all five?"],
+ lesson:"A SMART goal has a number, a date and a plan, and it is possible.",
+ ref:"Write one SMART goal for 2027.",
+ refAlt:"Write a SMART goal for a character you like.",
+ share:"Day 11: I made a SMART wish."},
+
+{dec:"Star on top",arch:"Changemaker",title:"Light the star",letter:"E",bonus:"",
+ story:"Almost there. The star only lights for one message, and I wrote it in Rebel glyphs. Use the glyph key to decode it.",
+ task:"Decode the message and type it, including the spaces.",
+ type:"text",ph:"The message",msgText:"START A RIPPLE",ans:["startaripple"],
+ answerText:"START A RIPPLE",
+ why:"A ripple starts with one small action, and each action reaches further than you can see.",
+ hints:["Use the glyph key. Count the dots first, then match the shape.","The message has 14 symbols: 12 letters and 2 spaces. Your tree letters now appear below.","Your letters from Days 1 to 11 plus today’s E spell the message when you split them into words of 5, 1 and 6 letters."],
+ lesson:"Changemakers start small: one ten-minute action, then it spreads.",
+ ref:"Choose one 10-minute action you can do this week. Write what it is and when you will do it.",
+ refAlt:"Choose a 10-minute action a character you admire might take.",
+ share:"Day 12: I lit the star."}
+];
+
+/* ---------- Small helpers ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function norm(s){return String(s).toLowerCase().replace(/[^a-z0-9]/g,"")}
+function pad(n){return n<10?"0"+n:""+n}
+function dkey(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function startDate(){return new Date(CFG.start[0],CFG.start[1],CFG.start[2])}
+function dayDate(n){var d=startDate();d.setDate(d.getDate()+n-1);return d}
+function fmt(d){try{return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})}catch(e){return dkey(d)}}
+function gl(ch){if(ch===" ")return{s:8,d:2};var c=ch.toUpperCase().charCodeAt(0)-65;return{s:c%9,d:Math.floor(c/9)}}
+function glyph(ch){var g=gl(ch),dots="";if(g.d===1)dots='<circle cx="0" cy="-27" r="3"/>';if(g.d===2)dots='<circle cx="-6" cy="-27" r="3"/><circle cx="6" cy="-27" r="3"/>';return '<svg class="gl" viewBox="-26 -34 52 64" aria-hidden="true"><g fill="currentColor" stroke="none">'+dots+'</g><use href="#g-'+SIG[g.s]+'"/></svg>'}
+function strip(word){var h='<div class="strip" role="img" aria-label="A message in Rebel glyphs, '+word.length+' symbols">';for(var i=0;i<word.length;i++)h+=glyph(word.charAt(i));return h+'</div>'}
+function keyTable(){var h='<div class="keytable" translate="no">';for(var i=0;i<27;i++){var ch=i<26?String.fromCharCode(65+i):" ";h+='<div class="keyc">'+glyph(ch)+'<span>'+(i<26?ch:"space")+'</span></div>'}return h+'</div>'}
+function maya(n){var bars=Math.floor(n/5),dots=n%5,h=62+ (bars?0:0),i,x,svg='';var H=18+bars*12+(dots?14:0)+4;
+ for(i=0;i<dots;i++){x=31-(dots-1)*7+i*14;svg+='<circle cx="'+x+'" cy="10" r="5" fill="currentColor"/>'}
+ for(i=0;i<bars;i++){svg+='<rect x="8" y="'+((dots?24:6)+i*12)+'" width="46" height="8" rx="4" fill="currentColor"/>'}
+ return '<svg viewBox="0 0 62 '+Math.max(H,24)+'" width="62" height="'+Math.max(H,24)+'" role="img" aria-label="Maya numeral">'+svg+'</svg>'}
+function flame(){return '<svg viewBox="0 0 40 70" width="40" height="70" aria-hidden="true"><path class="fl" d="M20 2Q33 18 20 34Q7 18 20 2Z" fill="#f6a223"/><path class="fl" style="animation-duration:.4s" d="M20 14Q26 22 20 30Q14 22 20 14Z" fill="#ffd978"/><rect x="12" y="36" width="16" height="30" rx="3" fill="#efe6d2"/></svg>'}
+
+/* ---------- State ---------- */
+var S=load(),DR={},ORD={},PK={},ALT={},MSGTXT="",RESETARM=false,FOCUS="",mem=null;
+function blank(){return{d:{},plays:[],name:"",preview:null,code:false}}
+function load(){try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&o.d&&o.plays)return o}}catch(e){}return mem||blank()}
+function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function dd(n){return S.d[n]||(S.d[n]={done:0,rung:0,tries:0,xp:0,bonus:0,ref:"",refDone:0})}
+function totalXP(){var t=0;for(var n=1;n<=12;n++){var s=S.d[n];if(s){if(s.done)t+=s.xp;if(s.bonus)t+=25;if(s.refDone)t+=25}}return t}
+function rank(x){var r=RANKS[0][1];RANKS.forEach(function(a){if(x>=a[0])r=a[1]});return r}
+function nDone(){var c=0;for(var n=1;n<=12;n++)if(S.d[n]&&S.d[n].done)c++;return c}
+function addPlay(){var k=dkey(new Date());if(S.plays.indexOf(k)<0)S.plays.push(k);if(S.plays.length>90)S.plays=S.plays.slice(-90)}
+function streak(){var set={},d=new Date(),n=0,miss=0,i;S.plays.forEach(function(k){set[k]=1});
+ for(i=0;i<60;i++){if(set[dkey(d)]){n++;miss=0}else if(i>0){miss++;if(miss>=2)break}d.setDate(d.getDate()-1)}return n}
+/* ---------- Release clock: gifts open at 12:00 am New Zealand time ---------- */
+var NZTZ="Pacific/Auckland",nzf=null;
+function nowMs(){return new Date().getTime()}
+function nzp(t){try{if(!nzf)nzf=new Intl.DateTimeFormat("en-GB",{timeZone:NZTZ,year:"numeric",month:"numeric",day:"numeric",hour:"numeric",minute:"numeric",second:"numeric",hourCycle:"h23"});var o={};nzf.formatToParts(new Date(t)).forEach(function(p){if(p.type!=="literal")o[p.type]=parseInt(p.value,10)});return o}catch(e){var d=new Date(t+13*36e5);return{year:d.getUTCFullYear(),month:d.getUTCMonth()+1,day:d.getUTCDate(),hour:d.getUTCHours(),minute:d.getUTCMinutes(),second:d.getUTCSeconds()}}}
+function nzDays(t){var p=nzp(t);return Math.round(Date.UTC(p.year,p.month-1,p.day)/864e5)}
+function startDays(){return Math.round(Date.UTC(CFG.start[0],CFG.start[1],CFG.start[2])/864e5)}
+function releasedCount(){return Math.max(0,Math.min(12,nzDays(nowMs())-startDays()+1))}
+function releaseAt(n){var d=new Date(Date.UTC(CFG.start[0],CFG.start[1],CFG.start[2]+n-1)),y=d.getUTCFullYear(),m=d.getUTCMonth(),dd=d.getUTCDate(),offs=[13,12],i,t,p;
+ for(i=0;i<2;i++){t=Date.UTC(y,m,dd)-offs[i]*36e5;p=nzp(t);if(p.hour===0&&p.day===dd)return t}
+ return Date.UTC(y,m,dd)-13*36e5}
+function nextRelease(){var up=nzDays(nowMs())-startDays()+1;if(up>=12)return null;return releaseAt(Math.max(1,up+1))}
+function fmtLocal(t){try{return new Date(t).toLocaleString("en-GB",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit",timeZoneName:"short"})}catch(e){return dkey(new Date(t))}}
+function isPreview(){if(TASTER)return false;if(S.preview!==null&&S.preview!==undefined)return S.preview;return releasedCount()===0}
+function openUpTo(){if(TASTER)return 1;return isPreview()?12:releasedCount()}
+function lockOf(n){if(TASTER)return n>1?"taster":"";if(n>openUpTo())return"time";if(CFG.codes.length&&n>1&&!S.code)return"code";return""}
+function cdText(){var nr=nextRelease();if(nr===null)return null;var s=Math.max(0,Math.floor((nr-nowMs())/1000)),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);return(d?d+"d ":"")+pad(h)+":"+pad(m)+":"+pad(s%60)}
+function cdPanel(){var nr=nextRelease(),up=nzDays(nowMs())-startDays()+1,nextN=Math.max(1,up+1);
+ if(nr===null)return '<section class="panel count"><p class="eyebrow">All gifts released</p><h2 style="margin:0">'+(TASTER?"The full challenge is open now.":"All twelve gifts are open.")+'</h2></section>';
+ return '<section class="panel count"><p class="eyebrow">'+(TASTER?"The full 12 Days opens in":"Next gift · Day "+nextN+" opens in")+'</p><div class="clock" id="cd" aria-hidden="true">'+cdText()+'</div><p class="small mute" style="margin:0">'+(TASTER?"Day 1 of the full challenge":"Gifts open by themselves at 12:00 am New Zealand time")+'. That is <b>'+esc(fmtLocal(nr))+'</b> in your time.</p></section>'}
+var lastOpen=-1;
+function tick(){var o=openUpTo();if(lastOpen>=0&&o!==lastOpen){lastOpen=o;render();return}lastOpen=o;var el=document.getElementById("cd");if(el){var t=cdText();if(t!==null)el.textContent=t}}
+
+/* ---------- Views placeholder ---------- */
+/* ---------- Gift boxes (hand-drawn style, one design per day) ---------- */
+var OUT="#2b1a12",GOLD="#fbbf1c";
+var GD=[
+ {w:78,h:60,c:"#3bb8e8",pat:"dots",pc:GOLD,rib:"vert",rc:OUT,bow:"loop",bc:"#e5322d"},
+ {w:98,h:52,c:"#7fb83a",pat:"diag",pc:"#3bb8e8",rib:"none",rc:"",bow:"big",bc:OUT},
+ {w:84,h:68,c:"#3a2418",pat:"none",pc:"",rib:"cross",rc:"#e5322d",bow:"loop",bc:"#e5322d"},
+ {w:82,h:72,c:"#e5322d",pat:"plaid",pc:OUT,rib:"cross",rc:GOLD,bow:"loop",bc:GOLD},
+ {special:"bag"},
+ {special:"blob"},
+ {w:70,h:88,c:"#b57be0",pat:"hstripe",pc:"#7a45b8",rib:"vert",rc:OUT,bow:"curl",bc:OUT},
+ {w:94,h:60,c:"#f4c542",pat:"argyle",pc:"#7fb83a",rib:"cross",rc:"#1d6fa5",bow:"big",bc:"#1d6fa5"},
+ {w:88,h:74,c:"#1d6fa5",pat:"dots",pc:"#b57be0",rib:"vert",rc:"#e5322d",bow:"loop",bc:"#e5322d"},
+ {w:76,h:78,c:"#3bb8e8",pat:"star",pc:"#e5322d",rib:"cross",rc:OUT,bow:"curl",bc:OUT},
+ {w:92,h:64,c:GOLD,pat:"none",pc:"",rib:"cross",rc:"#e5322d",bow:"loop",bc:"#e5322d"},
+ {w:110,h:46,c:"#4a2c1e",pat:"gstar",pc:GOLD,rib:"vert",rc:"#7fb83a",bow:"big",bc:"#7fb83a"}
+];
+function jit(n,k){return((n*7+k*13)%5-2)*.8}
+function starPath(cx,cy,r,r2){var p="",i,a,rr;for(i=0;i<10;i++){a=-Math.PI/2+i*Math.PI/5;rr=i%2?r2:r;p+=(i?"L":"M")+(cx+rr*Math.cos(a)).toFixed(1)+" "+(cy+rr*Math.sin(a)).toFixed(1)}return p+"Z"}
+function patt(id,kind,pc,x,y,w,h){var s='<clipPath id="'+id+'"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'"/></clipPath><g clip-path="url(#'+id+')">',i,j,k,cx,cy;
+ if(kind==="dots"){for(j=0;j*10<h+6;j++)for(i=0;i*11<w+6;i++)s+='<circle cx="'+(x+5+i*11+(j%2)*5.5)+'" cy="'+(y+5+j*10)+'" r="2.3" fill="'+pc+'"/>'}
+ else if(kind==="diag"){for(k=-h;k<w;k+=11)s+='<line x1="'+(x+k)+'" y1="'+(y+h)+'" x2="'+(x+k+h)+'" y2="'+y+'" stroke="'+pc+'" stroke-width="5"/>'}
+ else if(kind==="hstripe"){for(j=y+4;j<y+h;j+=12)s+='<rect x="'+x+'" y="'+j+'" width="'+w+'" height="5" fill="'+pc+'"/>'}
+ else if(kind==="plaid"){for(i=x+8;i<x+w;i+=16)s+='<rect x="'+i+'" y="'+y+'" width="5" height="'+h+'" fill="'+pc+'" opacity=".55"/>';for(j=y+8;j<y+h;j+=16)s+='<rect x="'+x+'" y="'+j+'" width="'+w+'" height="5" fill="'+pc+'" opacity=".55"/>'}
+ else if(kind==="argyle"){for(j=0;j*16<h+16;j++)for(i=0;i*16<w+16;i++)if((i+j)%2===0){cx=x+8+i*16;cy=y+8+j*16;s+='<polygon points="'+cx+','+(cy-8)+' '+(cx+8)+','+cy+' '+cx+','+(cy+8)+' '+(cx-8)+','+cy+'" fill="'+pc+'"/>'}}
+ return s+'</g>'}
+function bowSVG(kind,cx,y,c){
+ if(kind==="loop")return '<g fill="'+c+'" stroke="'+OUT+'" stroke-width="2" stroke-linejoin="round"><ellipse cx="'+(cx-9)+'" cy="'+(y-5)+'" rx="9" ry="5.5" transform="rotate(-24 '+(cx-9)+' '+(y-5)+')"/><ellipse cx="'+(cx+9)+'" cy="'+(y-5)+'" rx="9" ry="5.5" transform="rotate(24 '+(cx+9)+' '+(y-5)+')"/><circle cx="'+cx+'" cy="'+(y-2)+'" r="3.6"/></g>';
+ if(kind==="big")return '<g fill="'+c+'" stroke="'+OUT+'" stroke-width="2" stroke-linejoin="round"><path d="M'+cx+' '+(y-2)+'L'+(cx-18)+' '+(y+4)+'M'+cx+' '+(y-2)+'L'+(cx+18)+' '+(y+4)+'" fill="none"/><ellipse cx="'+(cx-13)+'" cy="'+(y-7)+'" rx="13" ry="7" transform="rotate(-28 '+(cx-13)+' '+(y-7)+')"/><ellipse cx="'+(cx+13)+'" cy="'+(y-7)+'" rx="13" ry="7" transform="rotate(28 '+(cx+13)+' '+(y-7)+')"/><circle cx="'+cx+'" cy="'+(y-3)+'" r="4.2"/></g>';
+ return '<g fill="none" stroke="'+c+'" stroke-width="2.8" stroke-linecap="round"><path d="M'+cx+' '+(y-1)+'Q'+(cx-16)+' '+(y-18)+' '+(cx-10)+' '+(y-9)+'Q'+(cx-4)+' '+(y-2)+' '+(cx-14)+' '+(y-12)+'"/><path d="M'+cx+' '+(y-1)+'Q'+(cx+16)+' '+(y-18)+' '+(cx+10)+' '+(y-9)+'Q'+(cx+4)+' '+(y-2)+' '+(cx+14)+' '+(y-12)+'"/></g><circle cx="'+cx+'" cy="'+(y-1)+'" r="3.4" fill="'+c+'"/>'}
+function spk(cx,cy,r,delay){return '<path class="sp" style="animation-delay:-'+delay+'s" d="M'+cx+' '+(cy-r)+'L'+(cx+r*.28)+' '+(cy-r*.28)+'L'+(cx+r)+' '+cy+'L'+(cx+r*.28)+' '+(cy+r*.28)+'L'+cx+' '+(cy+r)+'L'+(cx-r*.28)+' '+(cy+r*.28)+'L'+(cx-r)+' '+cy+'L'+(cx-r*.28)+' '+(cy-r*.28)+'Z" fill="'+GOLD+'"/>'}
+function badge(cx,cy,t){return '<g class="badge"><circle cx="'+cx+'" cy="'+cy+'" r="11.5"/><text x="'+cx+'" y="'+(cy+5)+'">'+t+'</text></g>'}
+function giftSVG(n,open){var g=GD[n-1],lab=open?LET[n-1]:String(n),s='',sp,top;
+ if(g.special==="bag"){
+  s+='<path d="M32 46L90 46L94 106L26 106Z" fill="#e5322d"/>'+patt("p"+n,"dots",GOLD,26,46,68,60)+'<path d="M32 46L90 46L94 106L26 106Z" fill="none" stroke="'+OUT+'" stroke-width="2.2" stroke-linejoin="round"/><path d="M60 62L63 70L71 70L65 75L67 83L60 78L53 83L55 75L49 70L57 70Z" fill="#fff" stroke="'+OUT+'" stroke-width="1.4" opacity="0"/>'+badge(60,78,lab)+
+  '<g class="lid"><path d="M44 46Q44 16 61 16Q78 16 78 46" fill="none" stroke="'+OUT+'" stroke-width="4.5" stroke-linecap="round"/><path d="M44 46Q44 16 61 16Q78 16 78 46" fill="none" stroke="#e5322d" stroke-width="2" stroke-linecap="round"/></g>';top=12}
+ else if(g.special==="blob"){
+  s+='<clipPath id="bl'+n+'"><ellipse cx="60" cy="72" rx="50" ry="34"/></clipPath><ellipse cx="60" cy="72" rx="50" ry="34" fill="#1aa5b8"/><g clip-path="url(#bl'+n+')"><g fill="'+GOLD+'"><circle cx="24" cy="62" r="3"/><circle cx="36" cy="88" r="3"/><circle cx="92" cy="60" r="3"/><circle cx="100" cy="82" r="3"/><circle cx="80" cy="96" r="3"/><circle cx="44" cy="52" r="3"/></g><path d="M28 74c0-5 7-6 8-1c1-5 8-4 8 1c0 5-8 9-8 11c0-2-8-6-8-11Z" fill="#7fb83a" stroke="'+OUT+'" stroke-width="1.2"/></g><ellipse cx="60" cy="72" rx="50" ry="34" fill="none" stroke="'+OUT+'" stroke-width="2.2"/><path d="M60 38V106" stroke="'+OUT+'" stroke-width="3" opacity=".0"/>'+badge(70,76,lab)+
+  '<g class="lid"><path d="M60 40Q54 24 44 24Q36 28 46 34" fill="none" stroke="'+OUT+'" stroke-width="3" stroke-linecap="round"/><path d="M60 40Q66 22 78 24Q84 30 74 34" fill="none" stroke="'+OUT+'" stroke-width="3" stroke-linecap="round"/><circle cx="60" cy="40" r="4" fill="'+OUT+'"/></g>';top=14}
+ else{
+  var x0=(120-g.w)/2,y0=108-g.h,lh=Math.max(14,Math.round(g.h*.28)),by=y0+lh-2,bh=g.h-lh+2,cx=60,
+  bp='M'+(x0+jit(n,1))+' '+(by+jit(n,2))+'L'+(x0+g.w+jit(n,3))+' '+(by+jit(n,4))+'L'+(x0+g.w+jit(n,5))+' '+(y0+g.h+jit(n,6))+'L'+(x0+jit(n,7))+' '+(y0+g.h+jit(n,8))+'Z';
+  s+='<path d="'+bp+'" fill="'+g.c+'"/>'+patt("b"+n,g.pat,g.pc,x0,by,g.w,bh);
+  if(g.pat==="star")s+='<path d="'+starPath(x0+g.w*.26,by+bh*.7,10,4.6)+'" fill="'+g.pc+'" stroke="'+OUT+'" stroke-width="1.5" stroke-linejoin="round"/>';
+  if(g.pat==="gstar")s+='<path d="'+starPath(x0+g.w*.24,by+bh*.55,10,4.6)+'" fill="'+g.pc+'" stroke="'+OUT+'" stroke-width="1.5" stroke-linejoin="round"/>';
+  if(g.rib!=="none")s+='<rect x="'+(cx-5)+'" y="'+by+'" width="10" height="'+bh+'" fill="'+g.rc+'"/>';
+  if(g.rib==="cross")s+='<rect x="'+x0+'" y="'+(by+bh*.46)+'" width="'+g.w+'" height="9" fill="'+g.rc+'"/>';
+  s+='<path d="'+bp+'" fill="none" stroke="'+OUT+'" stroke-width="2.2" stroke-linejoin="round"/>'+badge(cx+(g.rib==="vert"?20:0),by+bh*.5+(g.rib==="cross"?-9:0),lab);
+  s+='<g class="lid"><rect x="'+(x0-3)+'" y="'+y0+'" width="'+(g.w+6)+'" height="'+lh+'" fill="'+g.c+'"/>'+patt("l"+n,g.pat==="star"||g.pat==="gstar"?"none":g.pat,g.pc,x0-3,y0,g.w+6,lh)+(g.rib!=="none"?'<rect x="'+(cx-5)+'" y="'+y0+'" width="10" height="'+lh+'" fill="'+g.rc+'"/>':'')+'<rect x="'+(x0-3)+'" y="'+y0+'" width="'+(g.w+6)+'" height="'+lh+'" fill="none" stroke="'+OUT+'" stroke-width="2.2" stroke-linejoin="round"/>'+bowSVG(g.bow,cx,y0,g.bc)+'</g>';
+  top=y0-10}
+ sp=open?spk(28,top+4,6,.2)+spk(94,top-2,7,.9)+spk(60,Math.max(8,top-12),5,.5)+spk(106,top+20,4,1.2):'';
+ return '<svg class="gift'+(open?" open":"")+'" viewBox="0 0 120 110" aria-hidden="true">'+s+sp+'</svg>'}
+
+/* ---------- Views ---------- */
+var ICO={speaker:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>',stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',text:'<path d="M3 19l5-14 5 14M5 14h6M15 19l3.5-9 3.5 9M16.2 16h4.6"/>',speed:'<path d="M4 17a8 8 0 1 1 16 0"/><path d="M12 17l4-5"/>',calm:'<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>',access:'<circle cx="12" cy="5" r="2"/><path d="M5 9l7 1.5L19 9M12 10.5V15l-3 5M12 15l3 5"/>'};
+function ic(n){return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICO[n]+'</svg>'}
+var A11YOPEN=false;
+function canSpeak(){return !!(window.speechSynthesis&&window.SpeechSynthesisUtterance)}
+function micCtor(){return window.SpeechRecognition||window.webkitSpeechRecognition||null}
+function speakText(t){if(!canSpeak())return;var ss=window.speechSynthesis,rate=(S.pref&&S.pref.rate)||1,parts=t.match(/[^.!?]+[.!?]*/g)||[t];ss.cancel();parts.forEach(function(x){x=x.trim();if(!x)return;var u=new SpeechSynthesisUtterance(x);u.rate=rate;u.lang=(/translated/.test(document.documentElement.className)?navigator.language:(document.documentElement.lang||navigator.language))||"en-GB";ss.speak(u)})}
+function stopSpeak(){if(canSpeak())window.speechSynthesis.cancel()}
+function readZoneText(){var z=document.getElementById("readzone");if(!z)return"";var c=z.cloneNode(true);
+ c.querySelectorAll('.noread,.msg,input,select,textarea,[data-a="check"],[data-a="clear"],[data-a="mic"],[data-a="hint"],[data-a="say"],[data-a="stop"]').forEach(function(e){e.remove()});
+ c.querySelectorAll("svg").forEach(function(sv){var l=sv.getAttribute("aria-label");sv.replaceWith(document.createTextNode(l?" "+l+". ":" "))});
+ c.querySelectorAll("h1,h2,.who,li,p").forEach(function(e){e.appendChild(document.createTextNode(". "))});
+ return c.textContent.replace(/\s+/g," ").replace(/\.\s*\./g,".").trim()}
+var NW={zero:0,oh:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19},NT={twenty:20,thirty:30,forty:40,fifty:50,sixty:60,seventy:70,eighty:80,ninety:90},NF={pound:1,pounds:1,quid:1,and:1,dollars:1,dollar:1,the:1,is:1,it:1,its:1};
+function wordsToNum(s){var tk=String(s).toLowerCase().replace(/[-,.]/g," ").split(/\s+/).filter(Boolean),out="",i=0,seen=false;
+ for(;i<tk.length;i++){var w=tk[i];if(NF[w])continue;if(NT[w]!==undefined){var v=NT[w];if(i+1<tk.length&&NW[tk[i+1]]!==undefined&&NW[tk[i+1]]>0&&NW[tk[i+1]]<10){v+=NW[tk[i+1]];i++}out+=v;seen=true}else if(NW[w]!==undefined){out+=NW[w];seen=true}else if(/^\d+$/.test(w)){out+=w;seen=true}else return s}
+ return seen?out:s}
+function spoken(t){var w=wordsToNum(t);return w!==t?w:String(t).replace(/[.!?]+$/,"")}
+function listenRow(){return canSpeak()?'<div class="listen"><button class="btn alt" data-a="say">'+ic("speaker")+'Listen to this puzzle</button><button class="btn alt" data-a="stop">'+ic("stop")+'Stop</button></div>':''}
+function micBtn(id){return micCtor()?'<button class="btn alt" data-a="mic" data-t="'+id+'" aria-label="Voice typing. Press, then say your answer.">'+ic("mic")+'Speak</button>':''}
+function micStart(id){var C=micCtor();if(!C)return;var r=new C();r.lang=navigator.language||"en-GB";r.interimResults=false;r.maxAlternatives=1;
+ var m=document.getElementById("msg"),lv=document.getElementById("live");MSGTXT="Listening. Say your answer.";if(m)m.textContent=MSGTXT;if(lv)lv.textContent=MSGTXT;
+ r.onresult=function(e){var t=e.results[0][0].transcript;DR[id]=spoken(t);MSGTXT="I heard: “"+t+"”. Check it, then press Check.";FOCUS=id;render()};
+ r.onerror=function(e){MSGTXT=(e.error==="not-allowed"||e.error==="service-not-allowed")?"The microphone is blocked here. Use your keyboard’s dictation key instead, or type.":"I could not hear that. Try again or type your answer.";render()};
+ try{r.start()}catch(x){MSGTXT="Voice typing could not start. Type your answer or use your keyboard’s dictation key.";render()}}
+function a11yBar(){var p=S.pref||{},sz=p.size||0,rt=p.rate||1,pr=function(c){return c?"true":"false"};
+ return '<details class="a11y" id="a11y"'+(A11YOPEN?' open':'')+'><summary data-a="a11y">'+ic("access")+'Accessibility settings</summary>'+
+ '<div class="ctl"><span class="lab">'+ic("text")+'Text size</span><button class="btn alt" data-a="sz" data-i="0" aria-pressed="'+pr(sz===0)+'">Normal</button><button class="btn alt" data-a="sz" data-i="1" aria-pressed="'+pr(sz===1)+'">Large</button><button class="btn alt" data-a="sz" data-i="2" aria-pressed="'+pr(sz===2)+'">Extra large</button></div>'+
+ (canSpeak()?'<div class="ctl"><span class="lab">'+ic("speed")+'Reading speed</span><button class="btn alt" data-a="rate" data-r="0.8" aria-pressed="'+pr(rt===0.8)+'">Slow</button><button class="btn alt" data-a="rate" data-r="1" aria-pressed="'+pr(rt===1)+'">Normal</button><button class="btn alt" data-a="rate" data-r="1.25" aria-pressed="'+pr(rt===1.25)+'">Fast</button></div>':'')+
+ '<div class="ctl"><button class="btn alt" data-a="calm" aria-pressed="'+pr(!!p.calm)+'">'+ic("calm")+'Calm mode: stop all animation</button></div>'+
+ '<p class="small mute">'+(canSpeak()?'Every puzzle has a Listen button that uses your device’s own voice. ':'This browser cannot read aloud. ')+'To speak your answers, use the Speak button where it appears, or the microphone key on your phone or computer keyboard. The Speak button uses your browser’s speech service, and some browsers send the audio to the company that makes them. Typing is always fine.</p></details>'}
+function applyPrefs(){var p=S.pref||{},el=document.documentElement;try{el.style.fontSize=["100%","120%","145%"][p.size||0];if(p.calm)el.setAttribute("data-calm","1");else el.removeAttribute("data-calm")}catch(e){}}
+function hud(){if(TASTER&&route().v==="home")return navBar();var x=totalXP(),s=streak();
+ return '<header class="hud"><a class="brand" href="#home">12 Days of Rebels'+(TASTER?' · Taster':'')+'</a><div class="chips"><span class="chip"><b>XP</b> '+x+'</span><span class="chip"><b>Rank</b> '+rank(x)+'</span><span class="chip" title="One rest day never breaks it"><b>Streak</b> '+s+' day'+(s===1?"":"s")+'</span></div></header>'}
+function treeSVG(){var on=function(n){return S.d[n]&&S.d[n].done?" on":""},i,l="",sn="",bz="";
+ var lights=[[150,70,"#ff6b6b"],[172,86,"#ffd166"],[140,110,"#6bd6ff"],[186,126,"#ff6b6b"],[122,150,"#ffd166"],[170,168,"#6bd6ff"],[198,152,"#ff6b6b"],[100,196,"#ffd166"],[150,210,"#6bd6ff"]];
+ lights.forEach(function(p,k){l+='<circle class="tw" style="animation-delay:-'+(k*.37).toFixed(2)+'s;animation-duration:'+(1.2+(k%3)*.45).toFixed(2)+'s" cx="'+p[0]+'" cy="'+p[1]+'" r="4.5" fill="'+p[2]+'"/>'});
+ for(i=0;i<16;i++)sn+='<circle class="snow" style="animation-duration:'+(7+(i*7)%6)+'s;animation-delay:-'+((i*1.7)%9).toFixed(1)+'s" cx="'+(10+i*19)+'" cy="0" r="'+(1.3+(i%3)*.4).toFixed(1)+'" fill="#fff"/>';
+ [[112,228,8,"#4cc9f0"],[214,224,8,"#f72585"],[160,280,9,"#ffd166"],[88,282,8,"#80ed99"],[236,282,8,"#b5179e"]].forEach(function(b,k){bz+='<g class="sw" style="animation-delay:-'+(k*.7).toFixed(1)+'s"><line x1="'+b[0]+'" y1="'+(b[1]-b[2]-6)+'" x2="'+b[0]+'" y2="'+(b[1]-b[2])+'" stroke="#e9d9a6" stroke-width="1.5"/><circle cx="'+b[0]+'" cy="'+b[1]+'" r="'+b[2]+'" fill="'+b[3]+'"/><circle cx="'+(b[0]-b[2]*.35)+'" cy="'+(b[1]-b[2]*.35)+'" r="'+(b[2]*.26)+'" fill="#fff" opacity=".7"/></g>'});
+ return '<svg viewBox="0 0 320 380" role="img" aria-label="A Christmas tree. '+nDone()+' of 12 decorations are lit.">'+
+ '<rect width="320" height="380" rx="10" fill="#0f2233"/>'+
+ '<g fill="#ffffff" opacity=".55"><circle cx="30" cy="30" r="1.5"/><circle cx="96" cy="18" r="1.5"/><circle cx="226" cy="24" r="1.5"/><circle cx="300" cy="46" r="1.5"/><circle cx="270" cy="150" r="1.5"/><circle cx="24" cy="190" r="1.5"/><circle cx="296" cy="230" r="1.5"/></g>'+
+ '<g opacity=".85">'+sn+'</g>'+
+ '<rect x="0" y="336" width="320" height="44" fill="#cddbe6"/>'+
+ '<polygon points="160,40 80,150 240,150" fill="#2a7a58"/><polygon points="160,95 62,215 258,215" fill="#2f8a64"/><polygon points="160,150 44,290 276,290" fill="#359670"/>'+
+ '<rect x="146" y="290" width="28" height="34" fill="#6b4423"/>'+
+ '<g class="dec'+on(1)+'"><rect x="120" y="322" width="80" height="14" rx="3" fill="#b4532a"/><path d="M130 336L124 348M190 336L196 348" stroke="#b4532a" stroke-width="4" stroke-linecap="round"/></g>'+
+ '<g class="dec'+on(2)+'">'+l+'</g>'+
+ '<g class="dec'+on(3)+'" fill="none" stroke-linecap="round"><g stroke="#e86f9a" stroke-width="5"><path d="M104 140Q160 170 214 130"/><path d="M80 205Q160 240 242 200"/><path d="M62 268Q160 305 258 262"/></g><g class="march" stroke="#fff" stroke-width="2.4" stroke-dasharray="1 14"><path d="M104 140Q160 170 214 130"/><path d="M80 205Q160 240 242 200"/><path d="M62 268Q160 305 258 262"/></g></g>'+
+ '<g class="dec'+on(4)+'" transform="translate(118 182)"><g class="spin" stroke="#d8f1ff" stroke-width="2.2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/></g></g>'+
+ '<g class="dec'+on(5)+'"><circle class="glow" cx="200" cy="177" r="10" fill="#ffb02e" opacity=".35"/><rect x="196" y="186" width="8" height="18" fill="#f4efe2"/><path class="fl" d="M200 171Q206 179 200 185Q194 179 200 171Z" fill="#ffb02e"/></g>'+
+ '<g class="dec'+on(6)+'"><path d="M96 238Q130 262 160 244T226 240" fill="none" stroke="#f5ecd0" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 9"/><circle class="tw" style="animation-duration:2.2s" cx="130" cy="254" r="3.4" fill="#fff6d6"/><circle class="tw" style="animation-duration:1.7s;animation-delay:-.6s" cx="188" cy="246" r="3.4" fill="#fff6d6"/></g>'+
+ '<g class="dec'+on(7)+'" fill="none" stroke-linejoin="round"><path d="M92 262L108 252L124 266L140 254L156 268L172 256L188 270L204 258L220 270L236 260" stroke="#cfd8e3" stroke-width="3"/><path class="shim" d="M92 262L108 252L124 266L140 254L156 268L172 256L188 270L204 258L220 270L236 260" stroke="#fff" stroke-width="3" stroke-dasharray="3 22"/></g>'+
+ '<g class="dec'+on(8)+'">'+bz+'</g>'+
+ '<g class="dec'+on(9)+'"><g class="bob"><rect x="58" y="306" width="36" height="30" fill="#3a86ff"/><path d="M76 306V336M58 320H94" stroke="#ffd166" stroke-width="4"/></g><g class="bob" style="animation-delay:-1s"><rect x="226" y="312" width="40" height="24" fill="#ef476f"/><path d="M246 312V336M226 324H266" stroke="#ffd166" stroke-width="4"/></g></g>'+
+ '<g class="dec'+on(10)+'"><path d="M20 332L50 322M20 322L50 332" stroke="#8b5a2b" stroke-width="5" stroke-linecap="round"/><path class="fl" d="M35 296Q46 309 38 322Q27 309 35 296Z" fill="#ff8c42"/><path class="fl" style="animation-duration:.4s" d="M36 306Q41 312 37 320Q31 312 36 306Z" fill="#ffd166"/><circle class="tw" style="animation-duration:1.1s" cx="48" cy="292" r="1.8" fill="#ffd166"/><circle class="tw" style="animation-duration:1.5s;animation-delay:-.5s" cx="24" cy="288" r="1.6" fill="#ffd166"/></g>'+
+ '<g class="dec'+on(11)+'"><path d="M52 44A16 16 0 1 0 70 70A13 13 0 1 1 52 44Z" fill="#f1f5c8"/><circle class="tw" cx="268" cy="62" r="2.8" fill="#f1f5c8"/><circle class="tw" style="animation-delay:-.7s" cx="288" cy="100" r="2.4" fill="#f1f5c8"/><circle class="tw" style="animation-delay:-1.1s" cx="40" cy="124" r="2.4" fill="#f1f5c8"/></g>'+
+ '<g class="dec'+on(12)+'"><circle class="glow" cx="160" cy="34" r="26" fill="#f6c453" opacity=".22"/><path class="glow" d="M160 12L166 28L183 29L170 40L174 57L160 48L146 57L150 40L137 29L154 28Z" fill="#f6c453"/></g>'+
+ '</svg>'}
+function msgStrip(){var h='<div class="msgstrip" translate="no" role="img" aria-label="Collected letters">';MSG.forEach(function(d){if(!d)h+='<span class="cell gap"></span>';else{var got=S.d[d]&&S.d[d].done;h+='<span class="cell'+(got?"":" off")+'">'+(got?LET[d-1]:"·")+'</span>'}});return h+'</div>'}
+function tiles(){var h='<div class="days">',up=openUpTo(),today=isPreview()?0:up;
+ for(var n=1;n<=12;n++){var p=P[n-1],st=S.d[n],lk=lockOf(n),done=st&&st.done,cls="tile"+(done?" solved":"")+(lk?" locked":"")+(n===today&&!done&&!TASTER?" today":"")+(TASTER&&n===1&&!done?" today":""),
+ stat=done?"Key won: "+LET[n-1]:lk==="time"?"Opens "+fmtLocal(releaseAt(n)):lk==="code"?"Needs access code":lk==="taster"?"In the full challenge":(n===today||TASTER?"Open today":"Open"),
+ inner=giftSVG(n,!!done)+'<span class="t">'+p.dec+'</span><span class="a">Day '+n+' · '+p.arch+'</span><span class="s">'+stat+'</span>';
+ h+=lk?'<div class="'+cls+'" aria-disabled="true"><span class="sr">Day '+n+' is locked. </span>'+inner+'</div>':'<a class="'+cls+'" href="'+(TASTER?esc(CFG.form)+'" target="_blank" rel="noopener':'#day-'+n)+'" aria-label="Day '+n+', '+p.dec+(done?', solved':'')+'">'+inner+'</a>'}
+ return h+'</div>'}
+function ctaPanel(){var d=nDone();
+ return '<section class="panel cert"><p class="eyebrow">'+(d?"Day 1 cracked":"The full challenge")+'</p><h2>'+(d?"You won your first letter. Want the other 11?":"Want the other 11 gifts?")+'</h2><p>The full 12 Days of Rebels starts on 1 December: one puzzle a day, about 10 minutes each, a hint ladder, Rebel glyph ciphers, a tree that lights up and a certificate. Gifts open at 12:00 am New Zealand time.</p><div class="row" style="justify-content:center"><a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">Sign up for early-bird pricing</a></div><p class="small mute" style="margin-top:12px">For parents and teachers: ages 8 and up. Younger solvers may like a grown-up nearby. No accounts, no chat and nothing collected by this page. Progress stays on the learner’s device. Reflections are private and optional.</p></section>'}
+function navBar(){return '<header class="hud nav"><a class="brand" href="#home">12 Days of Rebels</a><nav class="navlinks" aria-label="Page sections"><a href="#decode">What you’ll decode</a><a href="#how">How it works</a><a href="#offer">Early-bird offer</a><a href="#faq">FAQ</a><a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">Try Day 1</a></nav></header>'}
+function cipherCard(){var spark=function(x,y,s,dl){return '<svg class="spk" style="left:'+x+'%;top:'+y+'%;width:'+s+'px;animation-delay:-'+dl+'s" viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 -9L2.2 -2.2L9 0L2.2 2.2L0 9L-2.2 2.2L-9 0L-2.2 -2.2Z" fill="currentColor"/></svg>'};
+ var row=function(w){var h='';for(var i=0;i<w.length;i++)h+='<span class="cg" style="animation-delay:-'+(i*.35).toFixed(2)+'s">'+glyph(w.charAt(i))+'</span>';return '<div class="crow">'+h+'</div>'};
+ return '<figure class="cipher"><figcaption class="eyebrow">A secret message for you</figcaption><div role="img" aria-label="A two-word greeting written in Rebel glyphs. Solve Day 1 to find the key.">'+row("WELCOME")+row("REBEL")+'</div><p class="cap">Can you read it? The key is waiting inside Day 1.</p>'+spark(6,10,18,0)+spark(90,16,14,1.1)+spark(84,78,20,.6)+spark(8,84,12,1.7)+'</figure>'}
+function keywordChips(){var w=["Decipher coded words","Rebel glyphs","A hidden message","Secret alphabets","Number locks","Logic riddles","Ancient counting systems","Crack the cipher"];return '<ul class="chips2">'+w.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul>'}
+function decodeCards(){return '<div class="cards">'+
+ '<div class="info"><h3>A secret alphabet</h3><p>Nine strange sigils, a few dots, and a whole language nobody taught you. Learn to read Rebel glyphs one puzzle at a time.</p></div>'+
+ '<div class="info"><h3>Twelve letters, one hidden message</h3><p>Every puzzle you crack earns a letter. Put all twelve in the right places and a message appears. What does it say?</p></div>'+
+ '<div class="info"><h3>Locks, grids and riddles</h3><p>Open a number lock, solve a logic grid, read how the Maya counted, and rebuild a scrambled sentence.</p></div>'+
+ '<div class="info"><h3>Which Rebel are you?</h3><p>Each day brings a different thinking style. By Day 12 you will know which one is yours.</p></div></div>'}
+function communityCards(){return '<div class="cards">'+
+ '<div class="info"><h3>Talk it through, no spoilers</h3><p>Every day has a hint thread. Ask for a nudge, give a nudge, and keep the answer to yourself until others have solved it.</p></div>'+
+ '<div class="info"><h3>Swap winter traditions</h3><p>On Day 8 you share how your family marks the season, and read how Rebels in other countries do it.</p></div>'+
+ '<div class="info"><h3>Level up together</h3><p>Team goals, peer hints and shared badges. You collect letters alone, but the message gets decoded together.</p></div>'+
+ '<div class="info"><h3>Build puzzles with others</h3><p>From January, Rebels in different time zones design new puzzles together around the UN Sustainable Development Goals.</p></div></div>'}
+function safetyStrip(){return '<div class="safe" role="note"><h3>Built to be safe</h3><ul><li>Moderated by INTL Education facilitators</li><li>Ages 13 and over</li><li>First names or nicknames only, no photos</li><li>A parent or teacher signs off before anyone joins</li></ul></div>'}
+function threadExample(){return '<figure class="thread"><figcaption>Example of a hint thread (illustration only)</figcaption><p class="bubble"><b>Rebel A:</b> Stuck on Day 2. Where do you even start with a five whys chain?</p><p class="bubble r"><b>Rebel B:</b> Nudge: start with what you can see from the street, then keep asking why. No spoilers!</p><p class="bubble"><b>Rebel A:</b> That did it. Thanks!</p></figure>'}
+function faqItem(q,a){return '<details><summary>'+q+'</summary><p>'+a+'</p></details>'}
+function joinRow(){return '<div class="row"><a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">Sign up for early-bird pricing</a></div>'}
+function offerBand(){return '<section class="band" id="offer"><p class="eyebrow">Early-bird offer · for families</p><h2>Sign up now, save on the January cohort</h2><p class="lead">Respectful Rebels is the program that follows these puzzles: a cohort starting in January where teens plan and launch a real project of their own. Sign up for 12 Days of Rebels and you earn early-bird pricing when enrollment opens.</p><div class="panel offer"><span class="tag">Early bird</span><h3>What signing up gets you</h3><ul class="ticks"><li>An early-bird discount on the Respectful Rebels cohort starting in January</li><li>The 12 Days of Rebels puzzles, one gift a day from 1 December</li></ul>'+joinRow()+'</div></section>'}
+function communityBand(){return '<section class="band" id="community"><p class="eyebrow">The community</p><h2>Don’t want to solve alone?</h2><p class="lead">Rebels join a moderated group of young people who love codes, big ideas and making a difference. Different countries, different time zones, one tree to light.</p>'+communityCards()+'<div class="two">'+threadExample()+safetyStrip()+'</div></section>'}
+function tasterHome(d){var h='';
+ if(d)h+='<section class="panel win" style="text-align:center"><p class="eyebrow">Day 1 cracked</p><h2>You won your first letter. Nice work.</h2><p>Eleven more gifts are waiting. Sign up to earn early-bird pricing on the Respectful Rebels cohort starting in January.</p>'+joinRow()+'</section>';
+ h+='<section class="hero"><div><p class="eyebrow">12 Days of Rebels · starts 1 December · ages 8 and up</p><h1>Decipher coded words. Crack the glyphs. Find the hidden message.</h1><p class="lead">Twelve winter gifts, twelve puzzles and one secret message written in an alphabet nobody has taught you. Open a new gift every day from 1 December.</p><div class="row"><a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">Try Day 1</a><a class="btn alt" href="#offer">See the early-bird offer</a></div><p class="small mute" style="margin-top:10px">Each puzzle takes about 10 minutes. No account needed to play.</p></div><div class="heroart">'+cipherCard()+'</div></section>';
+ h+='<section class="panel day1"><div class="g1">'+giftSVG(1,!!d)+'</div><div><p class="eyebrow">Taster</p><h2>Day 1: Who’s missing?</h2><p>A real puzzle from the challenge. Read the minutes of a town meeting, work out whose voice nobody asked for, win your first letter and unlock the glyph key.</p><div class="row"><a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">'+(d?"Look at Day 1 again":"Open the gift")+'</a></div></div></section>';
+ h+='<section class="band" id="decode"><p class="eyebrow">What you’ll uncover</p><h2>Secrets hidden in twelve gifts</h2>'+keywordChips()+decodeCards()+'</section>';
+ h+='<section class="band" id="how"><p class="eyebrow">How it works</p><h2>One gift a day, from 1 December</h2><ol class="steps"><li><b>Open.</b> A new gift opens by itself every day.</li><li><b>Solve.</b> One puzzle, about 10 minutes, no timer. Three hints if you need them.</li><li><b>Collect.</b> Win a letter and light a decoration. Twelve letters hide one message.</li><li><b>Decode.</b> Learn the glyph key and read what the Archivist left behind.</li></ol><div class="home" style="margin-top:16px"><div><div class="scene">'+treeSVG()+msgStrip()+'</div></div><div>'+cdPanel()+'<h3>The twelve gifts</h3><p class="mute small">Day 1 is open. The other eleven open in the full challenge.</p>'+tiles()+'</div></div></section>';
+ h+=offerBand()+communityBand();
+ h+='<section class="band"><p class="eyebrow">For parents and teachers</p><h2>What your young person gets</h2><div class="cards"><div class="info"><h3>Real skills</h3><p>Each day teaches one skill in 60 seconds, from spotting missing voices to writing a CV line and setting a SMART goal.</p></div><div class="info"><h3>Privacy first</h3><p>No accounts and no tracking in the puzzle app. Reflections stay on the learner’s device.</p></div><div class="info"><h3>Built for every learner</h3><p>Puzzles can be read aloud, text can be made larger, and animations can be switched off. Voice typing works where the browser supports it.</p></div><div class="info"><h3>Schools and youth groups</h3><p>'+(CFG.schools?'<a href="'+esc(CFG.schools)+'" target="_blank" rel="noopener">Ask about group access</a> for a class or club.':'Ask us about group access for a class or club.')+'</p></div></div></section>';
+ h+='<section class="band" id="faq"><h2>Questions</h2>'+faqItem("Do I need an account?","No. The puzzles run in your browser. Your progress stays on your device.")+faqItem("What do I get when I sign up?","You earn early-bird pricing on the Respectful Rebels cohort starting in January, and you get the 12 Days of Rebels puzzles. We share full details when enrollment opens.")+faqItem("Is there anything to pay now?","No. Signing up earns you early-bird pricing on the January cohort. Pricing and dates are shared when enrollment opens.")+faqItem("What is Respectful Rebels?","A program starting in January where teens plan and launch a real project of their own, guided by the Rebel archetypes you meet in these puzzles.")+faqItem("Who can join the community?","Young people aged 13 and over, with a parent or teacher’s sign-off. It is moderated, and members use first names or nicknames only.")+faqItem("When do gifts open?","Automatically at 12:00 am New Zealand time each day, starting on 1 December. That is 11:00 am on 30 November in the UK, 6:00 am Eastern and 3:00 am Pacific. Check <a href=\"https://www.worldtimebuddy.com/\" target=\"_blank\" rel=\"noopener\">worldtimebuddy.com</a> to see the release time in your time zone. Missed days stay open.")+faqItem("What if I get stuck?","Each puzzle has three hints. They lower the XP a little and never lock you out.")+faqItem("Can the puzzles be read aloud?","Yes. Every puzzle has a Listen button that reads it aloud in your device’s own voice. You can also make the text bigger, slow the voice down and switch off animations. Voice typing works in browsers that support it, and your keyboard’s dictation key works almost everywhere.")+'</section>';
+ h+='<section class="panel cert"><h2>Ready to be a Rebel?</h2><p class="big" style="font-size:1.3rem">Sign up and earn early-bird pricing</p><p>Respectful Rebels starts in January. Sign up now to earn the early-bird discount on the cohort.</p><div style="display:flex;justify-content:center">'+joinRow()+'</div></section>';
+ h+='<p class="small mute" style="text-align:center">Made by INTL Education CIC.</p>';
+ return h}
+function nextTodo(){for(var n=1;n<=12;n++){if(!(S.d[n]&&S.d[n].done)&&!lockOf(n))return n}return 0}
+function homeView(){if(TASTER)return tasterHome(nDone());var h='',d=nDone(),nt=nextTodo();
+ if(!d)h+='<section class="panel intro"><p class="eyebrow">Winter challenge · ages 8 and up · 1 to 12 December</p><h1>12 Days of Rebels</h1><p class="lead">Decipher coded words. Crack Rebel glyphs. Find the hidden message.</p><p>The Archivist sealed twelve gifts in the Frost Archive. Each one holds a puzzle with a single answer. Solve it to win a letter, light a decoration on the tree and learn one useful skill in about a minute. Twelve letters hide one secret message.</p><ol class="steps"><li><b>Open.</b> One new gift opens each day, at 12:00 am New Zealand time.</li><li><b>Solve.</b> Short puzzles, about 10 minutes, no timer.</li><li><b>Stuck?</b> Three hints per day. They lower XP a little and never lock you out.</li><li><b>Decode.</b> Collect twelve letters and read the Archivist’s message.</li></ol><div class="row"><a class="btn" href="#day-'+(nt||1)+'">Start Day '+(nt||1)+'</a><span class="small mute">No account. Progress stays on this device.</span></div></section>';
+ else h+='<section class="panel intro"><p class="eyebrow">Winter challenge · 1 to 12 December</p><h1>12 Days of Rebels</h1><p>You have cracked <b>'+d+' of 12</b> gifts. '+(d===12?'Every gift is open and the message is complete.':'Keep going: the message is taking shape.')+'</p>'+(nt?'<div class="row"><a class="btn" href="#day-'+nt+'">Continue with Day '+nt+'</a></div>':'')+'</section>';
+ if(CFG.codes.length&&!S.code)h+='<section class="panel"><h2>Have an access code?</h2><p>Day 1 is free. A code opens Days 2 to 12.</p><div class="row"><input type="text" id="code" placeholder="Access code" autocomplete="off" aria-label="Access code" value="'+esc(DR.code||"")+'"><button class="btn" data-a="code">Unlock</button></div><p class="msg">'+esc(MSGTXT)+'</p></section>';
+ h+='<div class="home"><div><div class="scene">'+treeSVG()+msgStrip()+'</div></div><div>'+cdPanel()+'<h2>Your twelve gifts</h2><p class="mute small">'+(isPreview()?"Preview mode: every gift is open so you can try them in any order. In the live challenge, Day 1 opens "+esc(fmtLocal(releaseAt(1)))+" your time.":"One new gift opens each day. Missed days stay open.")+'</p>'+tiles()+(d===12?'<p style="margin-top:14px"><a class="btn" href="#certificate">See your certificate</a></p>':'')+'</div></div>';
+ return h}
+function lockView(n,lk){if(lk==="taster")return '<a class="back" href="#home">← Back to the gifts</a>'+ctaPanel();
+ return '<a class="back" href="#home">← Back to the gifts</a><section class="panel"><h1>Day '+n+' is still wrapped</h1><p>'+(lk==="time"?"This gift opens by itself at 12:00 am New Zealand time, which is "+esc(fmtLocal(releaseAt(n)))+" in your time. Missed days stay open, so there is no rush.":"Enter your access code on the home page to open Days 2 to 12.")+'</p>'+(lk==="time"?'<div class="clock" id="cd" aria-hidden="true">'+(cdText()||"")+'</div><p class="small mute">Next gift opens in the time above (Day '+(Math.max(1,nzDays(nowMs())-startDays()+2))+').</p>':'')+'</section>'}
+
+function exhibit(n){var p=P[n-1],h='',i;
+ if(n===1){h+='<ol class="case">';p.lines.forEach(function(l){h+='<li><b>'+esc(l[0])+':</b> “'+esc(l[1])+'”</li>'});h+='</ol>'}
+ if(n===3||n===4){h+='<p><b>Clues</b></p><ul class="list">';p.clues.forEach(function(c){h+='<li>'+esc(c)+'</li>'});h+='</ul>'}
+ if(n===5){h+='<div class="candles">';p.vals.forEach(function(v){h+='<div class="candle">'+flame()+maya(v[1])+'<span class="lab">'+esc(v[0])+'</span></div>'});h+='</div>'}
+ if(n===7){h+='<table class="data"><thead><tr><th>Price per cup</th><th>Cups sold</th></tr></thead><tbody>';p.table.forEach(function(r){h+='<tr><td>£'+r[0].toFixed(2)+'</td><td>'+r[1]+'</td></tr>'});h+='</tbody></table><p class="small mute">Cost to make one cup: 60p.</p>'}
+ if(n===8){h+='<ul class="list">';p.cards.forEach(function(c){h+='<li><b>'+esc(c[0])+'</b>. '+esc(c[1])+'</li>'});h+='</ul>'}
+ if(n===12){h+=strip(p.msgText)}
+ return h}
+function orderUI(n){var p=P[n-1],o=ORD[n]||[],tiles=p.layout==="tiles",h='<div class="slots'+(tiles?' tiles':'')+'" aria-label="Your order">',i;
+ for(i=0;i<p.cards.length;i++){if(o[i]!==undefined)h+='<button class="slot full" data-a="unplace" data-i="'+i+'"><span class="k">'+(i+1)+'</span><span>'+esc(p.cards[o[i]])+'</span></button>';else if(!tiles)h+='<div class="slot"><span class="k">'+(i+1)+'</span><span class="mute">Empty</span></div>'}
+ if(tiles&&!o.length)h+='<span class="mute">Tap words below to build the sentence.</span>';
+ h+='</div><div class="pool" aria-label="Cards to place">';
+ p.perm.forEach(function(idx){if(o.indexOf(idx)<0)h+='<button class="card" data-a="place" data-i="'+idx+'">'+esc(p.cards[idx])+'</button>'});
+ h+='</div><div class="row"><button class="btn" data-a="check"'+(o.length<p.cards.length?' disabled':'')+'>Check</button><button class="btn alt" data-a="clear">Start again</button></div>';
+ return h}
+function matchUI(n){var p=P[n-1],h='';
+ p.rows.forEach(function(r,i){var v=DR["m"+i]||"";h+='<div class="matchrow"><label for="m'+i+'">'+esc(r.l)+'</label><select id="m'+i+'"><option value="">Choose…</option>';p.opts.forEach(function(o,j){h+='<option value="'+j+'"'+(String(j)===String(v)?" selected":"")+'>'+esc(o)+'</option>'});h+='</select></div>'});
+ return h+'<div class="row"><button class="btn" data-a="check">Check</button></div>'}
+function pickUI(n){var p=P[n-1],h='';
+ p.perm.forEach(function(idx){h+='<button class="opt" data-a="pick" data-i="'+idx+'" aria-pressed="'+(PK[n]===idx)+'">'+esc(p.opts[idx])+'</button>'});
+ return h+'<div class="row"><button class="btn" data-a="check">Check</button></div>'}
+function textUI(n){var p=P[n-1];return '<div class="row"><input type="text" id="ans" placeholder="'+esc(p.ph)+'" autocomplete="off" aria-label="'+esc(p.ph)+'" value="'+esc(DR.ans||"")+'">'+micBtn("ans")+'<button class="btn" data-a="check">Check</button></div>'}
+function widget(n){var t=P[n-1].type;return t==="order"?orderUI(n):t==="match"?matchUI(n):t==="pick"?pickUI(n):textUI(n)}
+function hintsUI(n){var p=P[n-1],st=dd(n),h='<div class="hints"><h2 class="noread">Need a hint?</h2><p class="mute small noread">Hints never lock you out. This puzzle is worth <b>'+XPS[st.rung]+' XP</b> now.</p>',i;
+ for(i=0;i<st.rung;i++)h+='<div class="rung"><b>Hint '+(i+1)+' · '+RUNG[i]+'</b>'+esc(p.hints[i])+'</div>';
+ if(n===12&&st.rung>=2){var got="";MSG.forEach(function(d){got+=!d?" ":(S.d[d]&&S.d[d].done?LET[d-1]:(d===12?"_":"_"))});h+='<div class="rung"><b>Your tree letters</b><span style="font-family:var(--f-mono);letter-spacing:.12em">'+esc(got)+'</span></div>'}
+ if(st.rung<3)h+='<button class="btn alt" data-a="hint">Show hint '+(st.rung+1)+' of 3 ('+RUNG[st.rung]+')</button>';
+ return h+'</div>'}
+function winUI(n){var p=P[n-1],st=dd(n),h='<section class="panel win" aria-labelledby="wt"><div class="keywon"><div class="keybox">'+glyph(LET[n-1])+'<span class="L">'+LET[n-1]+'</span></div><div><h2 id="wt">Key won: '+LET[n-1]+'</h2><p style="margin:0">+'+st.xp+' XP'+(st.rung?' (with '+st.rung+' hint'+(st.rung>1?'s':'')+')':' with no hints')+'</p></div></div>'+
+ '<p><b>Answer:</b> '+esc(p.answerText)+'</p><p>'+esc(p.why)+'</p><h3>60-second Rebel skill</h3><p>'+esc(p.lesson)+'</p>';
+ if(p.bonus){h+='<h3>Bonus: decode the seal (+25 XP)</h3>';
+  if(st.bonus)h+='<p>Decoded: <b>'+esc(p.bonus.toUpperCase())+'</b>. Bonus won.</p>';
+  else h+=strip(p.bonus.toUpperCase())+'<details><summary>Open the glyph key</summary>'+keyTable()+'<p class="small mute">Dots above a glyph: none for A to I, one for J to R, two for S to Z. The Changemaker sigil with two dots is a space.</p></details><div class="row"><input type="text" id="bonus" placeholder="Decoded word" autocomplete="off" aria-label="Decoded word" value="'+esc(DR.bonus||"")+'"><button class="btn" data-a="bonus">Decode</button></div><p class="msg">'+esc(MSGTXT)+'</p>'}
+ var alt=ALT[n],prompt=alt?p.refAlt:p.ref,rv=DR.ref!==undefined?DR.ref:st.ref;
+ h+='<h3>Private reflection (+25 XP)</h3><p>'+esc(prompt)+'</p><p class="small mute">This stays on this device only. Nobody else can read it, and nothing here is marked.</p><label class="sr" for="ref">Reflection</label><textarea id="ref" maxlength="800">'+esc(rv)+'</textarea><div class="row"><button class="btn" data-a="ref">Save privately</button><button class="btn alt" data-a="alt">'+(alt?'Use the personal prompt':'Write about a character instead')+'</button>'+(st.ref?'<button class="btn alt" data-a="refdel">Delete my reflection</button>':'')+'</div>'+(st.refDone?'<p class="small">Saved. Reflection bonus won.</p>':'');
+ h+='<h3>Share card</h3><p>“'+esc(p.share)+'”</p><div class="row"><button class="btn alt" data-a="copy">Copy</button></div>';
+ if((n===9||n===12)&&CFG.book)h+='<h3>Go deeper</h3><p>Explore every archetype in <a href="'+esc(CFG.book)+'" target="_blank" rel="noopener">The Rebels’ Handbook</a>. Ask a parent or teacher to help you get a copy.</p>';
+ h+=(TASTER&&n===1?'<h3>Don’t stop here</h3><p>Sign up to earn early-bird pricing on the Respectful Rebels cohort starting in January.</p>':'')+'<div class="row">'+(TASTER?'<a class="btn" href="'+esc(CFG.form)+'" target="_blank" rel="noopener">Sign up for early-bird pricing</a>':n<12?'<a class="btn" href="#day-'+(n+1)+'">Next: Day '+(n+1)+'</a>':'<a class="btn" href="#certificate">Get your certificate</a>')+'<a class="btn alt" href="#home">Back to the tree</a></div></section>';
+ return h}
+var EXTRA={"1": [{"t": "Google Santa Tracker", "u": "https://santatracker.google.com/", "d": "Holiday games and puzzles in the run-up to Christmas. Active in December."}], "2": [{"t": "NASA Kids’ Club", "u": "https://www.nasa.gov/learning-resources/nasa-kids-club/", "d": "Space games that start with a big question. Keep asking why."}, {"t": "Experiments with Google: Arts & Culture", "u": "https://experiments.withgoogle.com/collection/arts-culture", "d": "Playful experiments that mix art, culture and technology."}], "3": [{"t": "Tinkercad", "u": "https://www.tinkercad.com/", "d": "Build a virtual circuit and link up your own lights. Needs a free account."}], "4": [{"t": "Tynker", "u": "https://www.tynker.com/", "d": "Beginner coding puzzles. Some parts need a paid plan."}, {"t": "Scratch", "u": "https://scratch.mit.edu/", "d": "Make your own game or animation. A free account lets you save it."}], "5": [{"t": "NORAD Tracks Santa", "u": "https://www.noradsanta.org/", "d": "Follow a route on a live map. The tracker is active in December."}, {"t": "Math Playground: holiday games", "u": "https://www.mathplayground.com/holiday_games.html", "d": "Holiday maths and logic games."}], "6": [{"t": "Minecraft", "u": "https://www.minecraft.net/", "d": "Build something that solves a problem. The game itself is paid, so ask a grown-up."}, {"t": "Hour of AI", "u": "https://csforall.org/en-US/hour-of-ai", "d": "Short activities that explore how AI works and what you could make with it."}], "7": [{"t": "TimesTables.com", "u": "https://www.timestables.com/", "d": "Warm up your mental maths. It helps when you are working out profit."}, {"t": "Kahoot", "u": "https://kahoot.com/", "d": "Make a quick quiz or poll for friends and see what everyone thinks. Hosting needs an account."}], "8": [{"t": "Canva Christmas templates", "u": "https://www.canva.com/templates/christmas/", "d": "Design a card that shares your own winter traditions. Needs a free Canva account."}], "9": [{"t": "Google AI Quests", "u": "https://research.google/ai-quests/", "d": "Free games where you solve real-world problems with AI. Made for ages 11 to 14."}], "10": [{"t": "Storyline Online", "u": "https://storylineonline.net/", "d": "Stories read aloud by actors. Listen for how a storyteller builds the tale."}, {"t": "Highlights Kids", "u": "https://www.highlightskids.com/", "d": "Puzzles, jokes and stories for a quiet moment."}], "11": [{"t": "INTL Education", "u": "http://www.intl.education/", "d": "See what is coming in January, when your goals get a team."}], "12": [{"t": "INTL Education games", "u": "https://www.intl.education/offerings/our-games", "d": "More puzzle games from the people who made this one."}]};
+function extraUI(n){var L=EXTRA[n];if(!L||!L.length)return"";var h='<section class="panel extra" aria-labelledby="xt"><p class="eyebrow">Extended play · '+esc(P[n-1].arch)+'</p><h2 id="xt">Keep the fun going</h2><p class="small mute">Bonus ideas for a Rebel who is not done yet. These links leave this page, and some need a free account. Ask a parent or teacher first.</p><ul class="xl">';
+ L.forEach(function(x){h+='<li><a href="'+esc(x.u)+'" target="_blank" rel="noopener noreferrer">'+esc(x.t)+'</a><span> '+esc(x.d)+'</span></li>'});return h+'</ul></section>'}
+function dayView(n){var lk=lockOf(n);if(lk)return lockView(n,lk);
+ var p=P[n-1],st=dd(n),h='<a class="back" href="#home">← Back to the tree</a><section class="panel" aria-labelledby="dt"><p class="eyebrow">Day '+n+' of 12 · '+esc(p.dec)+' · '+esc(p.arch)+'</p>'+listenRow()+'<div id="readzone"><h1 id="dt" tabindex="-1">'+esc(p.title)+'</h1><blockquote class="story"><span class="who">The Archivist</span>'+esc(p.story)+'</blockquote>'+exhibit(n)+'<p class="task">'+esc(p.task)+'</p>';
+ if(st.done){h+='<p><b>Solved.</b> Well done.</p></div></section>'+winUI(n)+extraUI(n);return h}
+ if(n===12)h+='<details class="noread"><summary>Open the glyph key</summary>'+keyTable()+'<p class="small mute">Dots above a glyph: none for A to I, one for J to R, two for S to Z. The Changemaker sigil with two dots is a space.</p></details>';
+ h+=widget(n)+'<p class="msg" id="msg">'+esc(MSGTXT)+'</p>'+hintsUI(n)+'</div></section>';
+ return h}
+function certView(){if(nDone()<12)return '<a class="back" href="#home">← Back to the tree</a><section class="panel"><h1>Light all twelve first</h1><p>Your certificate appears when every day is solved. You have solved '+nDone()+' of 12.</p></section>';
+ var x=totalXP(),hints=0,best=0,bx=-1,n;for(n=1;n<=12;n++){hints+=S.d[n].rung;if(n<=8&&S.d[n].xp>bx){bx=S.d[n].xp;best=n}}
+ var h='<a class="back" href="#home">← Back to the tree</a><section class="panel cert"><p class="eyebrow">Winter Rebel certificate</p><div class="big">'+esc(S.name||"A Winter Rebel")+'</div><p>cracked all 12 scrolls and lit the star.</p><div class="strip" style="justify-content:center" aria-hidden="true">'+"START A RIPPLE".split("").map(glyph).join("")+'</div><p class="big" style="font-size:1.3rem">START A RIPPLE</p>'+
+ '<div class="stats"><span class="chip"><b>XP</b> '+x+'</span><span class="chip"><b>Rank</b> '+rank(x)+'</span><span class="chip"><b>Hints used</b> '+hints+'</span></div>'+
+ '<p>Your puzzle style this break: <b>'+esc(P[best-1].arch)+'</b> (your best day was Day '+best+'). This is a game result, not a test of you.</p>'+
+ '<p class="small mute">Add your first name only if you like. It is saved on this device and nowhere else. Take a screenshot to keep this.</p><div class="row" style="justify-content:center"><input type="text" id="name" maxlength="20" placeholder="First name" aria-label="First name" autocomplete="off" value="'+esc(DR.name!==undefined?DR.name:S.name)+'"><button class="btn alt" data-a="name">Save name</button></div></section>'+
+ '<section class="panel"><h2>What happens next</h2><p>In January the Rebels program starts: weekly quests, real skills for CVs and interviews, and moderated projects with young people in other countries.</p><div class="row">'+(CFG.signup?'<a class="btn" href="'+esc(CFG.signup)+'" target="_blank" rel="noopener">Ask about the January program</a>':'<span class="mute">Ask your teacher or a parent to find out about the January program.</span>')+(CFG.book?'<a class="btn alt" href="'+esc(CFG.book)+'" target="_blank" rel="noopener">Read your archetype in the book</a>':'')+'</div></section>';
+ return h}
+function aboutView(){return '<a class="back" href="#home">← Back to the tree</a><section class="panel"><h1>About this challenge</h1><h3>How points work</h3><p>Each puzzle is worth up to 100 XP. Hints lower it to 90, 75 or 55. A decoded seal and a saved reflection add 25 XP each. You never lose a key for using hints.</p><h3>Your privacy</h3><p>Your progress, reflections and name stay in this browser on this device. There are no accounts, no chat and no tracking in this version. Read-aloud uses your device’s own voice. If you use the Speak button, your browser’s speech service may receive the audio; typing or your keyboard’s dictation key avoids that. Clearing your browser data clears your progress.</p><h3>Who it is for</h3><p>Ages 13 and over. Younger learners should take part through a school or youth group.</p><h3>Need to talk to someone?</h3><p>If something is worrying you, tell a trusted adult. In the UK, Childline is free on 0800 1111.</p><h3>Rebel glyph key</h3>'+keyTable()+'<p class="small mute">Dots above a glyph: none for A to I, one for J to R, two for S to Z. The Changemaker sigil with two dots is a space.</p></section>'}
+function foot(){return '<div class="foot"><span>Progress stays on this device. <span class="mute">Page version: 19 Nov, Santa Tracker on Day 1.</span></span><a href="#about">About</a>'+(TASTER?'':'<label><input type="checkbox" id="pv" data-a="pv"'+(isPreview()?' checked':'')+'> Preview mode (all days open)</label>')+(RESETARM?'<button class="btn alt" data-a="reset">Tap again to erase all progress</button>':'<button class="btn alt" data-a="resetarm">Start over</button>')+'</div>'}
+
+/* ---------- Render and routing ---------- */
+function route(){var h=(location.hash||"#home").slice(1),m=/^day-(\d+)$/.exec(h);if(m){var n=parseInt(m[1],10);if(n>=1&&n<=12)return{v:"day",n:n}}if(h==="certificate"&&!TASTER)return{v:"cert"};if(h==="about")return{v:"about"};return{v:"home"}}
+var curKey="";
+function render(){var r=route(),k=r.v+(r.n||""),y=window.pageYOffset,html;
+ if(k!==curKey){DR={};ORD={};PK={};ALT={};MSGTXT="";RESETARM=false;curKey=k;y=0}
+ if(r.v==="day")html=dayView(r.n);else if(r.v==="cert")html=certView();else if(r.v==="about")html=aboutView();else html=homeView();
+ document.getElementById("app").innerHTML=hud()+html+a11yBar()+foot();applyPrefs();
+ document.getElementById("live").textContent=MSGTXT;
+ try{window.scrollTo(0,y)}catch(e){}
+ if(FOCUS){var el=document.getElementById(FOCUS);if(el)el.focus();FOCUS=""}
+ else if(y===0&&r.v!=="home"){var t=document.getElementById("dt");if(t)t.focus({preventScroll:true})}
+ try{document.title=TASTER?"12 Days of Rebels Taster":"12 Days of Rebels"}catch(e){}}
+
+/* ---------- Actions ---------- */
+function solve(n){var st=dd(n);st.done=1;st.xp=XPS[st.rung];addPlay();save();MSGTXT="";DR={};render()}
+function check(n){var p=P[n-1],st=dd(n),ok=false;
+ if(p.type==="text"){var v=norm(DR.ans||"");if(!v){MSGTXT="Type an answer first.";FOCUS="ans";render();return}ok=p.ans.indexOf(v)>-1||p.ans.indexOf(norm(wordsToNum(DR.ans||"")))>-1}
+ else if(p.type==="order"){var o=ORD[n]||[];if(o.length<p.cards.length)return;ok=o.every(function(a,i){return a===i})}
+ else if(p.type==="match"){var sel=p.rows.map(function(r,i){return DR["m"+i]||""});if(sel.some(function(s){return s===""})){MSGTXT="Choose an answer in every row first.";render();return}ok=sel.every(function(s,i){return parseInt(s,10)===p.rows[i].a})}
+ else if(p.type==="pick"){if(PK[n]===undefined){MSGTXT="Pick one wish first.";render();return}ok=PK[n]===p.correct}
+ if(ok){solve(n);return}
+ st.tries++;save();MSGTXT=WRONG[Math.min(st.tries-1,1)]+(st.tries>=2&&st.rung===0?" "+WRONG[2]:"");if(p.type==="text")FOCUS="ans";render()}
+document.addEventListener("input",function(e){var t=e.target;if(t&&t.id&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA")&&t.type!=="checkbox")DR[t.id]=t.value});
+document.addEventListener("change",function(e){var t=e.target;if(!t)return;if(t.tagName==="SELECT"&&t.id)DR[t.id]=t.value;if(t.id==="pv"){S.preview=t.checked;save();render()}});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target&&e.target.tagName==="INPUT"&&e.target.type==="text"){var b=document.querySelector("[data-a='check'],[data-a='bonus'],[data-a='code'],[data-a='name']");var id=e.target.id;var sel=id==="bonus"?"[data-a='bonus']":id==="code"?"[data-a='code']":id==="name"?"[data-a='name']":"[data-a='check']";b=document.querySelector(sel);if(b){e.preventDefault();b.click()}}});
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-a]");if(!b||b.tagName==="INPUT")return;var a=b.getAttribute("data-a"),r=route(),n=r.n,i=parseInt(b.getAttribute("data-i"),10),st;
+ if(a==="place"){(ORD[n]=ORD[n]||[]).push(i);render()}
+ else if(a==="unplace"){ORD[n].splice(i,1);render()}
+ else if(a==="clear"){ORD[n]=[];render()}
+ else if(a==="pick"){PK[n]=i;render()}
+ else if(a==="check"){check(n)}
+ else if(a==="hint"){st=dd(n);if(st.rung<3){st.rung++;save()}render()}
+ else if(a==="bonus"){st=dd(n);var v=norm(DR.bonus||"");if(!v){MSGTXT="Type the decoded word first.";FOCUS="bonus";render();return}if(v===P[n-1].bonus){st.bonus=1;save();MSGTXT="";DR.bonus="";render()}else{MSGTXT="Not quite. Check the dots first, then the shape.";FOCUS="bonus";render()}}
+ else if(a==="ref"){st=dd(n);var t=(DR.ref!==undefined?DR.ref:st.ref).trim();st.ref=t;if(t.length>=15&&!st.refDone)st.refDone=1;save();DR.ref=t;MSGTXT=t.length<15?"Write a little more (15 characters or more) to earn the bonus.":"";render()}
+ else if(a==="refdel"){st=dd(n);st.ref="";DR.ref="";save();render()}
+ else if(a==="a11y"){A11YOPEN=!A11YOPEN}
+ else if(a==="sz"){S.pref=S.pref||{};S.pref.size=i;save();A11YOPEN=true;render()}
+ else if(a==="rate"){S.pref=S.pref||{};S.pref.rate=parseFloat(b.getAttribute("data-r"));save();A11YOPEN=true;render()}
+ else if(a==="calm"){S.pref=S.pref||{};S.pref.calm=!S.pref.calm;save();A11YOPEN=true;render()}
+ else if(a==="say"){speakText(readZoneText())}
+ else if(a==="stop"){stopSpeak()}
+ else if(a==="mic"){micStart(b.getAttribute("data-t"))}
+ else if(a==="alt"){ALT[n]=!ALT[n];render()}
+ else if(a==="copy"){var txt=P[n-1].share;var done=function(){MSGTXT="Copied.";render()};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done,function(){MSGTXT="Select the text above to copy it.";render()})}else{MSGTXT="Select the text above to copy it.";render()}}
+ else if(a==="code"){var c=norm(DR.code||"");if(CFG.codes.some(function(x){return norm(x)===c})&&c){S.code=true;save();MSGTXT="";render()}else{MSGTXT="That code did not work. Check it and try again.";FOCUS="code";render()}}
+ else if(a==="name"){S.name=(DR.name||"").trim().slice(0,20);save();render()}
+ else if(a==="resetarm"){RESETARM=true;render()}
+ else if(a==="reset"){S=blank();save();DR={};ORD={};PK={};RESETARM=false;location.hash="#home";render()}});
+window.addEventListener("hashchange",render);
+render();
+lastOpen=openUpTo();setInterval(tick,1000);
+if(location.hash==="#selftest"){window.__R={P:P,LET:LET,MSG:MSG,gl:gl,S:function(){return S},CFG:CFG,releaseAt:releaseAt,openUpTo:openUpTo,cdText:cdText,tick:tick,nextRelease:nextRelease}}
+})();
+</script>
+
+</body></html>
